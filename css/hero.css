@@ -51,7 +51,7 @@
 }
 
 .station-svg {
-  width: min(46vw, 400px);
+  width: min(60vw, 540px);
   height: auto;
 }
 
@@ -254,12 +254,12 @@
 }
 
 @media (max-width: 1024px) {
-  .station-svg { width: min(55vw, 340px); }
+  .station-svg { width: min(68vw, 440px); }
 }
 
 @media (max-width: 640px) {
   .hero { min-height: 92vh; }
-  .station-svg { width: 60vw; }
+  .station-svg { width: 62vw; }
   .hero__scene { padding-top: clamp(12px, 3vh, 32px); }
   .hero__content { padding-bottom: var(--space-xl); }
 }
@@ -268,12 +268,12 @@
    para o headline nunca colidir com a estação, independente da largura. */
 @media (max-height: 820px) {
   .hero__scene { padding-top: clamp(8px, 2.5vh, 24px); }
-  .station-svg { width: min(38vw, 300px); }
+  .station-svg { width: min(48vw, 380px); }
   .hero__content { padding-bottom: var(--space-lg); }
   .hero__subheadline { margin-bottom: var(--space-md); }
 }
 
 @media (max-height: 680px) {
-  .station-svg { width: min(30vw, 220px); }
+  .station-svg { width: min(38vw, 280px); }
   .hero__scroll-cue { display: none; }
 }
