@@ -24,5 +24,6 @@ Hotsite.setupInView = function (selector) {
 document.addEventListener('DOMContentLoaded', function () {
   if (Hotsite.heroScene) Hotsite.heroScene.init();
   if (Hotsite.cards) Hotsite.cards.init();
+  if (Hotsite.videoPlayer) Hotsite.videoPlayer.init();
   Hotsite.setupInView('#cards');
 });

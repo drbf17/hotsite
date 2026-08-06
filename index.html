@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/cards.css" />
 <link rel="stylesheet" href="css/results.css" />
 <link rel="stylesheet" href="css/positioning.css" />
+<link rel="stylesheet" href="css/video.css" />
 <link rel="stylesheet" href="css/animations.css" />
 </head>
 <body>
@@ -391,9 +392,31 @@
   </div>
 </section>
 
+<section id="video" class="video-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Transformação</span>
+      <h2 class="section-heading__title">A tecnologia revolucionando a experiência dos gestores de produto</h2>
+      <p class="section-heading__subtitle">Assista para entender o impacto da plataforma no dia a dia de quem decide.</p>
+    </div>
+
+    <div class="video-player" data-video-player>
+      <video class="video-player__el" data-video-el preload="metadata" playsinline>
+        <source src="assets/vdo/trasformacao.mp4" type="video/mp4" />
+      </video>
+      <button class="video-player__play" type="button" data-video-play aria-label="Reproduzir vídeo: a tecnologia revolucionando a experiência dos gestores de produto">
+        <span class="video-player__play-circle">
+          <svg class="video-player__play-icon" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6,4 20,12 6,20" /></svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>
+
 <script src="js/utils.js"></script>
 <script src="js/hero-scene.js"></script>
 <script src="js/cards.js"></script>
+<script src="js/video.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
