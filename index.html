@@ -21,13 +21,17 @@
   <div class="hero__starfield" aria-hidden="true"></div>
 
   <div class="hero__scene" aria-hidden="true">
-    <svg class="station-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ilustração de uma estação espacial montada, com foguetes de diferentes cores acoplados a ela">
+    <svg class="station-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ilustração de uma estação espacial montada, com o logo da plataforma no núcleo e foguetes de diferentes cores acoplados a ela">
       <defs>
         <radialGradient id="hubGlow" cx="50%" cy="45%" r="65%">
           <stop offset="0%" stop-color="#c3d8ff" />
           <stop offset="55%" stop-color="#2f6df0" />
           <stop offset="100%" stop-color="#0a1a3c" />
         </radialGradient>
+
+        <clipPath id="hubEmblemClip">
+          <circle r="58" />
+        </clipPath>
 
         <g id="rocket-template">
           <path class="rocket-fin" d="M -22,95 L -46,128 L -22,110 Z" />
@@ -85,6 +89,10 @@
         <circle class="hub-ring-outer" r="132" />
         <circle class="hub-ring-mid" r="104" />
         <circle class="hub-core" r="72" fill="url(#hubGlow)" />
+        <g class="hub-emblem">
+          <image href="assets/img/icone.webp" xlink:href="assets/img/icone.webp" x="-58" y="-58" width="116" height="116" clip-path="url(#hubEmblemClip)" preserveAspectRatio="xMidYMid slice" />
+          <circle class="hub-emblem-ring" r="58" />
+        </g>
         <circle class="hub-light" cx="0" cy="-118" r="6" style="animation-delay:0s" />
         <circle class="hub-light" cx="102" cy="-58" r="6" style="animation-delay:.4s" />
         <circle class="hub-light" cx="102" cy="58" r="6" style="animation-delay:.8s" />

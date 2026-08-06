@@ -131,6 +131,13 @@
   animation: blink-light 2.4s ease-in-out infinite;
 }
 
+.hub-emblem-ring {
+  fill: none;
+  stroke: var(--color-white);
+  stroke-width: 2.5;
+  opacity: 0.85;
+}
+
 /* Nós de acoplamento */
 .dock-node {
   fill: var(--color-orange-500);
