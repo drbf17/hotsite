@@ -1,0 +1,177 @@
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.card {
+  position: relative;
+  min-height: 280px;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-white-soft);
+  border: 1px solid var(--color-white-mute);
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+.card:hover,
+.card:focus-within,
+.card.is-flipped {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-blue-500);
+  outline-offset: 3px;
+}
+
+.card__media {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-md);
+}
+
+.card__icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+.card__icon--before {
+  opacity: 1;
+  color: var(--color-blue-700);
+}
+
+.card__icon--after {
+  opacity: 0;
+  color: var(--color-orange-500);
+  transform: scale(0.85);
+}
+
+.card:hover .card__icon--before,
+.card:focus-within .card__icon--before,
+.card.is-flipped .card__icon--before {
+  opacity: 0;
+}
+
+.card:hover .card__icon--after,
+.card:focus-within .card__icon--after,
+.card.is-flipped .card__icon--after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.icon-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-fill {
+  fill: currentColor;
+}
+
+.card__face {
+  position: relative;
+  transition: opacity var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+.card__face--before {
+  opacity: 1;
+}
+
+.card__face--after {
+  position: absolute;
+  inset: var(--space-lg) var(--space-lg) auto var(--space-lg);
+  top: calc(56px + var(--space-md));
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.card:hover .card__face--before,
+.card:focus-within .card__face--before,
+.card.is-flipped .card__face--before {
+  opacity: 0;
+}
+
+.card:hover .card__face--after,
+.card:focus-within .card__face--after,
+.card.is-flipped .card__face--after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card__face h3 {
+  font-size: var(--fs-md);
+  color: var(--color-blue-900);
+  margin: var(--space-sm) 0 var(--space-xs);
+}
+
+.card__face p {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---- Card de destaque: loop automático ---- */
+.card--featured {
+  background: linear-gradient(160deg, var(--color-blue-100), var(--color-white-soft) 60%);
+  border-color: var(--color-blue-100);
+}
+
+#cards.in-view .card--featured .card__icon--after,
+#cards.in-view .card--featured .card__face--after {
+  animation: featured-loop 4.2s ease-in-out infinite;
+}
+
+#cards.in-view .card--featured .card__icon--before,
+#cards.in-view .card--featured .card__face--before {
+  animation: featured-loop-before 4.2s ease-in-out infinite;
+}
+
+#cards.in-view .card--featured:hover .card__icon--after,
+#cards.in-view .card--featured:focus-within .card__icon--after,
+#cards.in-view .card--featured.is-flipped .card__icon--after,
+#cards.in-view .card--featured:hover .card__face--after,
+#cards.in-view .card--featured:focus-within .card__face--after,
+#cards.in-view .card--featured.is-flipped .card__face--after {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+#cards.in-view .card--featured:hover .card__icon--before,
+#cards.in-view .card--featured:focus-within .card__icon--before,
+#cards.in-view .card--featured.is-flipped .card__icon--before,
+#cards.in-view .card--featured:hover .card__face--before,
+#cards.in-view .card--featured:focus-within .card__face--before,
+#cards.in-view .card--featured.is-flipped .card__face--before {
+  animation: none;
+  opacity: 0;
+}
+
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 260px;
+  }
+}

@@ -1,0 +1,272 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: var(--color-text-inverse);
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 15%, rgba(161, 61, 124, 0.35), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 82% 10%, rgba(58, 33, 102, 0.4), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 100%, var(--scene-space-mid), transparent 70%),
+    var(--scene-space-deep);
+}
+
+/* ---- Estrelas ---- */
+.hero__starfield {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero__star-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--scene-star);
+  animation: star-twinkle 4s ease-in-out infinite;
+}
+
+.star--far { opacity: 0.5; }
+.star--mid { opacity: 0.7; box-shadow: 0 0 4px rgba(255, 255, 255, 0.6); }
+.star--near { box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
+
+/* ---- Cena SVG ---- */
+.hero__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: clamp(16px, 4vh, 48px);
+  pointer-events: none;
+}
+
+.station-svg {
+  width: min(46vw, 400px);
+  height: auto;
+}
+
+/* Painéis solares */
+.solar-array {
+  transform-box: fill-box;
+  animation: panel-track 9s ease-in-out infinite;
+}
+
+.solar-array--left { transform-origin: 100% 50%; }
+.solar-array--right { transform-origin: 0% 50%; animation-delay: -3s; }
+
+.truss {
+  stroke: var(--color-blue-100);
+  stroke-width: 4;
+  opacity: 0.7;
+}
+
+.panel {
+  fill: var(--scene-space-mid);
+  stroke: var(--scene-panel-glow);
+  stroke-width: 2;
+}
+
+.panel-grid {
+  stroke: var(--scene-panel-glow);
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+/* Antena */
+.antenna-mast {
+  stroke: var(--color-blue-100);
+  stroke-width: 4;
+  opacity: 0.8;
+}
+
+.antenna-ring {
+  fill: none;
+  stroke: var(--scene-panel-glow);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: antenna-ping 2.6s ease-out infinite;
+}
+
+.antenna-ring--delay {
+  animation-delay: 1.3s;
+}
+
+.antenna-tip {
+  fill: var(--color-orange-500);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: antenna-tip-pulse 2.6s ease-in-out infinite;
+}
+
+/* Núcleo da estação */
+.hub-ring-outer {
+  fill: none;
+  stroke: var(--color-blue-500);
+  stroke-width: 3;
+  opacity: 0.55;
+}
+
+.hub-ring-mid {
+  fill: var(--scene-space-mid);
+  stroke: var(--color-blue-100);
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.hub-light {
+  fill: var(--color-orange-400);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: blink-light 2.4s ease-in-out infinite;
+}
+
+/* Nós de acoplamento */
+.dock-node {
+  fill: var(--color-orange-500);
+  stroke: var(--color-orange-100);
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+/* Foguetes */
+.rocket-body {
+  fill: #eef2fb;
+  stroke: rgba(10, 26, 60, 0.35);
+  stroke-width: 2;
+}
+
+.rocket-nose,
+.rocket-fin {
+  fill: var(--rocket-accent, var(--color-blue-500));
+}
+
+.rocket-fin { opacity: 0.85; }
+
+.rocket-stripe {
+  fill: var(--rocket-accent, var(--color-orange-500));
+}
+
+.rocket-window {
+  fill: #12213f;
+  stroke: var(--scene-panel-glow);
+  stroke-width: 2;
+}
+
+.rocket-window-highlight {
+  fill: #cfe0ff;
+  opacity: 0.8;
+}
+
+.rocket-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: flame-pulse 1.6s ease-in-out infinite;
+}
+
+.rocket-flame-outer {
+  fill: var(--scene-thruster);
+  opacity: 0.85;
+}
+
+.rocket-flame-core {
+  fill: var(--scene-thruster-core);
+}
+
+/* ---- Scrim + conteúdo ---- */
+.hero__scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 48%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--scene-space-deep) 82%);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 3;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding: 0 var(--container-pad) var(--space-2xl);
+  text-align: center;
+  animation: headline-in var(--duration-slow) var(--ease-standard) both;
+  animation-delay: 0.15s;
+}
+
+.hero__eyebrow {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-orange-400);
+  margin-bottom: var(--space-sm);
+}
+
+.hero__headline {
+  font-size: clamp(1.9rem, 5.2vh, var(--fs-3xl));
+  line-height: var(--lh-tight);
+  font-weight: 800;
+  margin-bottom: var(--space-md);
+}
+
+.hero__subheadline {
+  font-size: var(--fs-md);
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: var(--space-lg);
+}
+
+.hero__scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hero__scroll-cue-line {
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.5);
+  animation: scroll-bounce 1.8s ease-in-out infinite;
+}
+
+@media (max-width: 1024px) {
+  .station-svg { width: min(55vw, 340px); }
+}
+
+@media (max-width: 640px) {
+  .hero { min-height: 92vh; }
+  .station-svg { width: 60vw; }
+  .hero__scene { padding-top: clamp(12px, 3vh, 32px); }
+  .hero__content { padding-bottom: var(--space-xl); }
+}
+
+/* Telas baixas (laptops com pouca altura) — encolhe a cena e o respiro vertical
+   para o headline nunca colidir com a estação, independente da largura. */
+@media (max-height: 820px) {
+  .hero__scene { padding-top: clamp(8px, 2.5vh, 24px); }
+  .station-svg { width: min(38vw, 300px); }
+  .hero__content { padding-bottom: var(--space-lg); }
+  .hero__subheadline { margin-bottom: var(--space-md); }
+}
+
+@media (max-height: 680px) {
+  .station-svg { width: min(30vw, 220px); }
+  .hero__scroll-cue { display: none; }
+}

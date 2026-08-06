@@ -1,0 +1,51 @@
+@keyframes star-twinkle {
+  0%, 100% { opacity: var(--base-opacity, 0.6); }
+  50% { opacity: 0.15; }
+}
+
+@keyframes blink-light {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+@keyframes panel-track {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+@keyframes antenna-ping {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes antenna-tip-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes flame-pulse {
+  0%, 100% { transform: scaleY(0.9); opacity: 0.75; }
+  50% { transform: scaleY(1.15); opacity: 1; }
+}
+
+@keyframes headline-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes featured-loop {
+  0%, 35% { opacity: 0; transform: translateY(6px); }
+  50%, 85% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes featured-loop-before {
+  0%, 35% { opacity: 1; }
+  50%, 85% { opacity: 0; }
+  100% { opacity: 1; }
+}
