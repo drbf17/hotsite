@@ -58,3 +58,27 @@
   border-radius: 50%;
   background: currentColor;
 }
+
+.back-to-menu {
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5em 1em;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 10, 31, 0.45);
+  backdrop-filter: blur(6px);
+  color: var(--color-white);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.back-to-menu:hover {
+  background: rgba(6, 10, 31, 0.7);
+}
