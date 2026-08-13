@@ -24,8 +24,9 @@ Hotsite.setupInView = function (selector) {
 document.addEventListener('DOMContentLoaded', function () {
   if (Hotsite.heroScene) Hotsite.heroScene.init();
   if (Hotsite.scenario) Hotsite.scenario.init();
+  if (Hotsite.practices) Hotsite.practices.init();
 
-  ['#conceitos', '#cenario', '#solucao', '#roadmap', '#fechamento'].forEach(function (selector) {
+  ['#conceitos', '#cenario', '#solucao', '#jeito-certo', '#roadmap', '#fechamento'].forEach(function (selector) {
     Hotsite.setupInView(selector);
   });
 });

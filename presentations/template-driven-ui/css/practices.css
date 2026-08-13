@@ -1,0 +1,114 @@
+.practices-section {
+  background: var(--color-white);
+}
+
+.practices-lead {
+  max-width: 42rem;
+  margin: 0 auto var(--space-xl);
+  text-align: center;
+}
+
+.practice-switch-wrap {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.practice-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-white-mute);
+  border-radius: var(--radius-pill);
+}
+
+.practice-switch__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.practice-switch__btn[data-practice-mode="dont"].is-active {
+  background: var(--color-orange-500);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.practice-switch__btn[data-practice-mode="do"].is-active {
+  background: var(--color-blue-700);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.practice-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 760px;
+  margin: 0 auto;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.practice-list.is-switching {
+  opacity: 0;
+}
+
+.practice-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-white-soft);
+  border: 1px solid var(--color-white-mute);
+}
+
+.practice-row__badge {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  color: var(--color-white);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.practice-list[data-mode="dont"] .practice-row__badge {
+  background-color: var(--color-orange-500);
+}
+
+.practice-list[data-mode="do"] .practice-row__badge {
+  background-color: var(--color-blue-700);
+}
+
+.practice-row__text {
+  flex: 1;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  color: var(--color-text-secondary);
+}
+
+.practice-list[data-mode="dont"] [data-variant="do"] {
+  display: none;
+}
+
+.practice-list[data-mode="do"] [data-variant="dont"] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .practice-switch-wrap {
+    overflow-x: auto;
+  }
+}

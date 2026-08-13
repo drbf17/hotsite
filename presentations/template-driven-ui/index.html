@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/scenario.css" />
 <link rel="stylesheet" href="css/solucao.css" />
 <link rel="stylesheet" href="css/results.css" />
+<link rel="stylesheet" href="css/practices.css" />
 <link rel="stylesheet" href="css/roadmap.css" />
 <link rel="stylesheet" href="css/positioning.css" />
 <link rel="stylesheet" href="css/animations.css" />
@@ -263,6 +264,70 @@
   </div>
 </section>
 
+<section id="jeito-certo" class="practices-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">O Jeito Certo</span>
+      <h2 class="section-heading__title">O jeito certo de fazer Template Driven UI</h2>
+      <p class="section-heading__subtitle">Template Driven UI não é sinônimo de telas monolíticas, presas a uma biblioteca comum e com baixa flexibilidade — isso é exatamente o gargalo de desenvolvimento que essa arquitetura deveria eliminar.</p>
+    </div>
+
+    <div class="practice-switch-wrap">
+      <div class="practice-switch" data-practice-switch role="tablist" aria-label="Alternar entre o que não fazer e o que fazer em Template Driven UI">
+        <button type="button" class="practice-switch__btn is-active" data-practice-mode="dont" role="tab" aria-selected="true">
+          <span aria-hidden="true">✕</span> O que não fazer
+        </button>
+        <button type="button" class="practice-switch__btn" data-practice-mode="do" role="tab" aria-selected="false">
+          <span aria-hidden="true">✓</span> O que fazer
+        </button>
+      </div>
+    </div>
+
+    <ol class="practice-list" data-practice-list data-mode="dont" aria-live="polite">
+      <li class="practice-row" data-animate="1">
+        <span class="practice-row__badge" aria-hidden="true">
+          <span data-variant="dont">✕</span>
+          <span data-variant="do">✓</span>
+        </span>
+        <p class="practice-row__text" data-variant="dont">Templates engessados, que não permitem ativar ou desativar campos, telas e opções conforme a jornada.</p>
+        <p class="practice-row__text" data-variant="do">Templates flexíveis, que permitem ativar e desativar campos, telas e opções para cada jornada específica.</p>
+      </li>
+      <li class="practice-row" data-animate="2">
+        <span class="practice-row__badge" aria-hidden="true">
+          <span data-variant="dont">✕</span>
+          <span data-variant="do">✓</span>
+        </span>
+        <p class="practice-row__text" data-variant="dont">Templates presos a uma biblioteca do app, com forte uso de módulos nativos — toda mudança exige atualização na loja.</p>
+        <p class="practice-row__text" data-variant="do">Templates atualizados over the air (OTA), sem depender do ciclo de publicação nas lojas.</p>
+      </li>
+      <li class="practice-row" data-animate="3">
+        <span class="practice-row__badge" aria-hidden="true">
+          <span data-variant="dont">✕</span>
+          <span data-variant="do">✓</span>
+        </span>
+        <p class="practice-row__text" data-variant="dont">Templates tratados como componentes de tela inteira, mantidos em uma biblioteca de design system.</p>
+        <p class="practice-row__text" data-variant="do">Templates tratados como meta-jornadas, que recebem dados de configuração — incluindo endpoints de BFF — e realmente minimizam o esforço de desenvolvimento.</p>
+      </li>
+      <li class="practice-row" data-animate="4">
+        <span class="practice-row__badge" aria-hidden="true">
+          <span data-variant="dont">✕</span>
+          <span data-variant="do">✓</span>
+        </span>
+        <p class="practice-row__text" data-variant="dont">Telas e jornadas planejadas por áreas distantes do dia a dia do produto, de forma autoritária.</p>
+        <p class="practice-row__text" data-variant="do">Equipe dedicada a ouvir as necessidades dos times de produto e identificar oportunidades de templatização.</p>
+      </li>
+      <li class="practice-row" data-animate="5">
+        <span class="practice-row__badge" aria-hidden="true">
+          <span data-variant="dont">✕</span>
+          <span data-variant="do">✓</span>
+        </span>
+        <p class="practice-row__text" data-variant="dont">Evoluções no template forçando ajustes constantes nas jornadas, fora do ritmo dos times de produto.</p>
+        <p class="practice-row__text" data-variant="do">Templates versionados, com contratos imutáveis e roadmap claro de suporte: quebrar o contrato exige uma nova versão, com convivência entre versões por um prazo bem definido.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
 <section id="roadmap" class="roadmap-section section">
   <div class="container">
     <div class="section-heading">
@@ -337,6 +402,7 @@
 <script src="js/utils.js"></script>
 <script src="js/hero-scene.js"></script>
 <script src="js/scenario.js"></script>
+<script src="js/practices.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
