@@ -61,6 +61,20 @@
   background: var(--color-orange-500);
 }
 
+#solucao.in-view .roi-compare__fill--before {
+  animation: roi-fill-before 3.2s ease-in-out infinite;
+}
+
+#solucao.in-view .roi-compare__fill--mid {
+  animation: roi-fill-mid 3.2s ease-in-out infinite;
+  animation-delay: 0.25s;
+}
+
+#solucao.in-view .roi-compare__fill--after {
+  animation: roi-fill-after 3.2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
 .roi-compare__value {
   flex: 0 0 108px;
   font-size: var(--fs-xs);

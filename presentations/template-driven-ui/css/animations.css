@@ -27,6 +27,24 @@
   50% { transform: scale(1.04); opacity: 1; }
 }
 
+@keyframes roi-fill-before {
+  0% { width: 0%; }
+  45%, 70% { width: 100%; }
+  100% { width: 0%; }
+}
+
+@keyframes roi-fill-mid {
+  0% { width: 0%; }
+  45%, 70% { width: 34%; }
+  100% { width: 0%; }
+}
+
+@keyframes roi-fill-after {
+  0% { width: 0%; }
+  45%, 70% { width: 12%; }
+  100% { width: 0%; }
+}
+
 [data-animate] {
   opacity: 0;
   transform: translateY(18px);
