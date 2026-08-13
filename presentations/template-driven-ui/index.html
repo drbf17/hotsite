@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Template Driven UI — Uma base, infinitas jornadas</title>
+<meta name="description" content="Como a arquitetura Template Driven UI reduz time to market, custo de engenharia e fragmentação de experiência ao transformar jornadas de produto em configuração." />
+<link rel="stylesheet" href="css/reset.css" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/hero.css" />
+<link rel="stylesheet" href="css/concepts.css" />
+<link rel="stylesheet" href="css/scenario.css" />
+<link rel="stylesheet" href="css/solucao.css" />
+<link rel="stylesheet" href="css/results.css" />
+<link rel="stylesheet" href="css/roadmap.css" />
+<link rel="stylesheet" href="css/positioning.css" />
+<link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+<a class="back-to-menu" href="../../index.html">&larr; Apresentações</a>
+
+<section id="hero" class="hero">
+  <div class="hero__starfield" aria-hidden="true"></div>
+
+  <div class="hero__scene" aria-hidden="true">
+    <svg class="template-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ilustração de um núcleo de template irradiando cinco telas de produto coloridas, conectadas por linhas pulsantes">
+      <defs>
+        <radialGradient id="coreGlow" cx="50%" cy="45%" r="65%">
+          <stop offset="0%" stop-color="#c3d8ff" />
+          <stop offset="55%" stop-color="#2f6df0" />
+          <stop offset="100%" stop-color="#0a1a3c" />
+        </radialGradient>
+
+        <g id="screen-template">
+          <rect class="screen-body" x="-50" y="-62" width="100" height="124" rx="10" />
+          <rect class="screen-accent-bar" x="-50" y="-62" width="100" height="14" rx="10" />
+          <line class="screen-line" x1="-34" y1="-28" x2="34" y2="-28" />
+          <line class="screen-line" x1="-34" y1="-8" x2="18" y2="-8" />
+          <line class="screen-line" x1="-34" y1="12" x2="28" y2="12" />
+          <rect class="screen-cta" x="-34" y="32" width="68" height="16" rx="8" />
+        </g>
+      </defs>
+
+      <!-- Conexões pulsantes do núcleo até cada tela gerada -->
+      <g class="connections">
+        <line class="connection-line" x1="500" y1="400" x2="663" y2="237" />
+        <line class="connection-line" x1="500" y1="400" x2="663" y2="563" />
+        <line class="connection-line" x1="500" y1="400" x2="500" y2="630" />
+        <line class="connection-line" x1="500" y1="400" x2="337" y2="563" />
+        <line class="connection-line" x1="500" y1="400" x2="337" y2="237" />
+      </g>
+
+      <!-- Núcleo do template -->
+      <g transform="translate(500,400)">
+        <g class="template-core">
+          <rect class="core-ring-outer" x="-92" y="-92" width="184" height="184" rx="30" />
+          <rect class="core-body" x="-64" y="-64" width="128" height="128" rx="20" fill="url(#coreGlow)" />
+          <line class="core-grid" x1="-64" y1="-21" x2="64" y2="-21" />
+          <line class="core-grid" x1="-64" y1="21" x2="64" y2="21" />
+          <line class="core-grid" x1="-21" y1="-64" x2="-21" y2="64" />
+          <line class="core-grid" x1="21" y1="-64" x2="21" y2="64" />
+          <circle class="core-light" cx="0" cy="-92" r="6" style="animation-delay:0s" />
+          <circle class="core-light" cx="92" cy="0" r="6" style="animation-delay:.6s" />
+          <circle class="core-light" cx="0" cy="92" r="6" style="animation-delay:1.2s" />
+          <circle class="core-light" cx="-92" cy="0" r="6" style="animation-delay:1.8s" />
+        </g>
+      </g>
+
+      <!-- Telas de produto geradas a partir do mesmo template -->
+      <use href="#screen-template" xlink:href="#screen-template" class="screen" style="--screen-accent:#ff7a1a" transform="translate(663,237)" />
+      <use href="#screen-template" xlink:href="#screen-template" class="screen" style="--screen-accent:#2f6df0" transform="translate(663,563)" />
+      <use href="#screen-template" xlink:href="#screen-template" class="screen" style="--screen-accent:#2fb8a6" transform="translate(500,630)" />
+      <use href="#screen-template" xlink:href="#screen-template" class="screen" style="--screen-accent:#8a5cf6" transform="translate(337,563)" />
+      <use href="#screen-template" xlink:href="#screen-template" class="screen" style="--screen-accent:#ef5da8" transform="translate(337,237)" />
+    </svg>
+  </div>
+
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__content">
+    <span class="hero__eyebrow">SuperApp · Arquitetura Orientada a Templates</span>
+    <h1 class="hero__headline">Uma base. Infinitas jornadas.</h1>
+    <p class="hero__subheadline">Cada nova jornada de produto não precisa nascer do zero. Descubra como Template Driven UI transforma meses de desenvolvimento em semanas de configuração.</p>
+    <a class="hero__scroll-cue" href="#conceitos" aria-label="Rolar para a seção Conceitos Fundamentais">
+      <span class="hero__scroll-cue-line"></span>
+      Explorar
+    </a>
+  </div>
+</section>
+
+<section id="conceitos" class="concepts-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Nivelamento</span>
+      <h2 class="section-heading__title">Três formas de construir uma jornada</h2>
+      <p class="section-heading__subtitle">Antes de falar de solução, vamos alinhar o vocabulário — porque nem toda jornada deveria nascer do zero.</p>
+    </div>
+
+    <div class="concepts-spectrum" aria-hidden="true">
+      <span>Mais controle, mais esforço</span>
+      <span class="concepts-spectrum__bar"></span>
+      <span>Mais escala, menos esforço</span>
+    </div>
+
+    <div class="concepts-grid">
+
+      <article class="concept-card" data-animate="1">
+        <span class="badge"><span class="badge__dot"></span>Artesanal</span>
+        <h3 class="concept-card__title">Jornadas Customizadas</h3>
+        <p class="concept-card__desc">Construídas do zero, para um único produto. Cada tela, cada regra de negócio e cada integração são desenhadas e codificadas sob medida.</p>
+        <p class="concept-card__indication">Indicado para produtos de altíssimo volume ou extrema especificidade, onde o CAPEX se justifica pelo retorno exclusivo de uma solução dedicada.</p>
+        <div class="concept-card__footer">
+          <ul class="spec-list">
+            <li>Codebase dedicada por produto, sem reaproveitamento estrutural</li>
+            <li>Ciclo completo de design e desenvolvimento sob medida</li>
+            <li>Custo de manutenção e evolução mais alto ao longo do tempo</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="concept-card concept-card--featured" data-animate="2">
+        <span class="badge badge--blue"><span class="badge__dot"></span>Ponto de Equilíbrio</span>
+        <h3 class="concept-card__title">Templates Low Code</h3>
+        <p class="concept-card__desc">O balanço perfeito entre velocidade de entrega e adequação ao produto. A jornada é montada a partir de componentes configuráveis do design system, com espaço para lógica e integrações específicas.</p>
+        <p class="concept-card__indication">Indicado para a maioria das jornadas transacionais — onde previsibilidade de prazo importa tanto quanto aderência ao produto.</p>
+        <div class="concept-card__footer">
+          <ul class="spec-list">
+            <li>Motor de renderização + schema de configuração (JSON/YAML)</li>
+            <li>Componentes do design system parametrizáveis por produto</li>
+            <li>Integração facilitada com sistemas legados via SDK/API</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="concept-card" data-animate="3">
+        <span class="badge badge--solid"><span class="badge__dot"></span>Escala Máxima</span>
+        <h3 class="concept-card__title">Templates No Code</h3>
+        <p class="concept-card__desc">Não demanda desenvolvimento de software — apenas parametrização e cadastro do produto em uma plataforma corporativa já madura.</p>
+        <p class="concept-card__indication">Indicado para escala. Onde o gargalo de crescimento não pode ser o time de engenharia.</p>
+        <div class="concept-card__footer">
+          <ul class="spec-list">
+            <li>Motor de orquestração self-service, sem deploy por produto</li>
+            <li>Depende de sistemas corporativos já adaptados e maduros</li>
+            <li>Time to market medido em horas, não em sprints</li>
+          </ul>
+          <p class="callout">Um novo restaurante no iFood. Uma nova loja no Mercado Livre. Nenhuma linha de código nova — apenas cadastro.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="cenario" class="scenario-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">O Cenário Atual</span>
+      <h2 class="section-heading__title">Hoje, toda jornada nasce do zero</h2>
+      <p class="section-heading__subtitle">Mesmo quando duas jornadas são, na prática, a mesma coisa com um produto diferente.</p>
+    </div>
+
+    <p class="scenario-lead">A maioria das empresas trata todas as jornadas como customizadas. O modelo artesanal brilha em cenários específicos — o problema é aplicá-lo como regra padrão para tudo, gerando perda de agilidade, oportunidades de negócio desperdiçadas e custos que não precisariam existir.</p>
+
+    <blockquote class="rhetorical-quote">Quantas vezes sua equipe já idealizou, prototipou, codificou e testou — em silos completamente separados — duas jornadas que, no fundo, eram a mesma jornada com um produto diferente?</blockquote>
+
+    <div class="pipelines" role="img" aria-label="Duas jornadas de produtos financeiros diferentes, ambas percorrendo as mesmas cinco etapas em silos separados: idealizar, prototipar, codificar, testar e lançar">
+      <div class="pipeline" data-animate="1">
+        <span class="pipeline__label">Produto Financeiro A</span>
+        <div class="pipeline__steps">
+          <span class="pipeline__step">Idealizar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Prototipar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Codificar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Testar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Lançar</span>
+        </div>
+      </div>
+      <div class="pipeline" data-animate="2">
+        <span class="pipeline__label">Produto Financeiro B</span>
+        <div class="pipeline__steps">
+          <span class="pipeline__step">Idealizar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Prototipar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Codificar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Testar</span>
+          <span class="pipeline__arrow">→</span>
+          <span class="pipeline__step">Lançar</span>
+        </div>
+      </div>
+    </div>
+    <p class="pipelines-caption">Mesma sequência. Mesmo padrão de tela: apresentação, simulação, contrato, assinatura, sucesso. Dois times, dois cronogramas, o dobro do esforço.</p>
+
+    <div class="impact-reveal">
+      <button class="impact-toggle" type="button" data-impact-toggle aria-expanded="false">Ver o impacto real</button>
+      <div class="impact-badges" data-impact-badges>
+        <span class="impact-badge">Time to market prejudicado</span>
+        <span class="impact-badge">Oportunidades de negócio perdidas</span>
+        <span class="impact-badge">Custos de engenharia e design duplicados</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="solucao" class="solucao-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">A Solução</span>
+      <h2 class="section-heading__title">Template Driven UI: o motor por trás da eficiência</h2>
+      <p class="section-heading__subtitle">Um sistema de templates parametrizáveis que transforma "construir uma jornada" em "configurar uma jornada".</p>
+    </div>
+
+    <p class="solucao-lead">Quanto vale, para o negócio, lançar uma nova jornada em semanas — não meses? Quanto vale liberar o time de engenharia do trabalho repetitivo para investir em diferenciação real?</p>
+
+    <div class="roi-compare" role="img" aria-label="Comparação ilustrativa de tempo até o lançamento: jornada customizada leva meses, jornada Template Driven UI leva semanas">
+      <div class="roi-compare__row">
+        <span class="roi-compare__label">Jornada customizada</span>
+        <span class="roi-compare__track"><span class="roi-compare__fill roi-compare__fill--before"></span></span>
+        <span class="roi-compare__value">Meses</span>
+      </div>
+      <div class="roi-compare__row">
+        <span class="roi-compare__label">Template Driven UI</span>
+        <span class="roi-compare__track"><span class="roi-compare__fill roi-compare__fill--after"></span></span>
+        <span class="roi-compare__value">Semanas</span>
+      </div>
+    </div>
+    <p class="roi-compare-caption">Ilustrativo — tempo até o lançamento de uma nova jornada transacional.</p>
+
+    <div class="results-grid">
+      <div class="result-tile" data-animate="1">
+        <svg class="result-tile__icon" viewBox="0 0 24 24"><rect class="icon-stroke" x="5" y="5" width="6" height="6" rx="1"/><rect class="icon-stroke" x="13" y="5" width="6" height="6" rx="1"/><rect class="icon-stroke" x="5" y="13" width="6" height="6" rx="1"/><rect class="icon-stroke" x="13" y="13" width="6" height="6" rx="1"/></svg>
+        <h3 class="result-tile__title">Reaproveitamento de Componentes</h3>
+        <p class="result-tile__desc">Cada jornada nova reaproveita componentes já testados, homologados e em produção — soluções que escalam junto com o portfólio.</p>
+      </div>
+      <div class="result-tile" data-animate="2">
+        <svg class="result-tile__icon" viewBox="0 0 24 24"><polygon class="icon-fill" points="13,2 4,14 11,14 10,22 20,9 13,9"/></svg>
+        <h3 class="result-tile__title">Menor Time to Market</h3>
+        <p class="result-tile__desc">Lançamentos em semanas, não em meses. A diferença entre capturar uma janela de mercado e vê-la se fechar.</p>
+      </div>
+      <div class="result-tile" data-animate="3">
+        <svg class="result-tile__icon" viewBox="0 0 24 24"><path class="icon-stroke" d="M4,16 a8,8 0 0 1 16,0"/><line class="icon-stroke" x1="12" y1="16" x2="16" y2="10"/><circle class="icon-fill" cx="12" cy="16" r="1.3"/></svg>
+        <h3 class="result-tile__title">Redução de Custos</h3>
+        <p class="result-tile__desc">Menos horas de engenharia e design alocadas por jornada, e menor consumo de infraestrutura — incluindo otimização de chamadas e tokens de IA em fluxos assistidos.</p>
+      </div>
+      <div class="result-tile" data-animate="4">
+        <svg class="result-tile__icon" viewBox="0 0 24 24"><circle class="icon-stroke" cx="12" cy="12" r="8"/><circle class="icon-stroke" cx="12" cy="12" r="4.5"/><circle class="icon-fill" cx="12" cy="12" r="1.3"/></svg>
+        <h3 class="result-tile__title">Uniformidade e Consistência (UX)</h3>
+        <p class="result-tile__desc">A marca fala a mesma língua visual e funcional em todos os canais, sem depender da interpretação de cada time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="roadmap-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Roadmap</span>
+      <h2 class="section-heading__title">Do quick win ao norte estratégico</h2>
+      <p class="section-heading__subtitle">Duas fases, uma trajetória. Começamos pelo ganho rápido e evoluímos para a escala máxima.</p>
+    </div>
+
+    <div class="roadmap">
+      <article class="phase-card" data-animate="1">
+        <div class="phase-card__number">01</div>
+        <span class="badge badge--blue"><span class="badge__dot"></span>Comece aqui</span>
+        <h3 class="phase-card__title">Low Code — o primeiro passo</h3>
+        <p class="phase-card__desc">A implementação mais rápida dentro do ciclo de vida do projeto. Nossa vitória de curto prazo: menos estrutura pesada de backend, resultado tangível já nos primeiros ciclos.</p>
+        <ul class="spec-list">
+          <li>Requer menos investimento inicial em motores de renderização dedicados</li>
+          <li>Minimiza a necessidade imediata de múltiplos middlewares complexos</li>
+          <li>Aproveita a base de design system e infraestrutura já existentes</li>
+        </ul>
+      </article>
+
+      <article class="phase-card phase-card--future" data-animate="2">
+        <div class="phase-card__number">02</div>
+        <span class="badge"><span class="badge__dot"></span>Onde queremos chegar</span>
+        <h3 class="phase-card__title">No Code — a visão de futuro</h3>
+        <p class="phase-card__desc">O norte estratégico da arquitetura. Uma fase futura porque exige uma fundação técnica mais robusta — mas que devolve escala praticamente ilimitada.</p>
+        <ul class="spec-list">
+          <li>Motor de renderização dinâmico, orientado a schema</li>
+          <li>Middlewares orquestradores de backend (BFF) dedicados</li>
+          <li>Infraestrutura avançada de armazenamento e gerenciamento de estado/configuração</li>
+          <li>Governança e versionamento dos templates publicados</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="fechamento" class="positioning-section section">
+  <div class="container">
+    <div class="positioning">
+      <span class="positioning__eyebrow">Posicionamento</span>
+      <h2 class="positioning__statement">Template Driven UI não economiza linhas de código. Multiplica a capacidade de gerar valor — sem multiplicar o time.</h2>
+      <p class="positioning__body">Cada jornada que hoje nasce do zero é uma jornada que amanhã poderia nascer configurada. A pergunta não é se vamos adotar Template Driven UI — é quantas oportunidades de negócio vamos deixar na mesa até decidirmos começar.</p>
+    </div>
+  </div>
+</section>
+
+<script src="js/utils.js"></script>
+<script src="js/hero-scene.js"></script>
+<script src="js/scenario.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

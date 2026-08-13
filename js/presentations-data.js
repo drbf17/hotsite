@@ -4,6 +4,12 @@ window.PRESENTATIONS = [
     title: 'O que muda para o negócio',
     description: 'Como a plataforma de mini-apps transforma arquitetura, velocidade e qualidade para as linhas de negócio.',
     href: 'presentations/mudanca-para-negocio/index.html'
+  },
+  {
+    slug: 'template-driven-ui',
+    title: 'Template Driven UI',
+    description: 'Como uma arquitetura orientada a templates reduz time to market, custo de engenharia e fragmentação de experiência.',
+    href: 'presentations/template-driven-ui/index.html'
   }
 
   // Para adicionar uma nova apresentação:

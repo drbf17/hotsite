@@ -1,0 +1,131 @@
+.scenario-section {
+  background: var(--color-white-soft);
+}
+
+.scenario-lead {
+  max-width: 42rem;
+  margin: 0 auto var(--space-xl);
+  text-align: center;
+  font-size: var(--fs-md);
+  color: var(--color-text-secondary);
+}
+
+.pipelines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 880px;
+  margin: 0 auto var(--space-sm);
+}
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--color-white);
+  border: 1px solid var(--color-white-mute);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.pipeline__label {
+  flex: 0 0 168px;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--color-blue-700);
+}
+
+.pipeline__steps {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-wrap: wrap;
+}
+
+.pipeline__step {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-white-mute);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-pill);
+}
+
+.pipeline__arrow {
+  color: var(--color-orange-500);
+  font-size: var(--fs-sm);
+  line-height: 1;
+}
+
+.pipelines-caption {
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-bottom: var(--space-2xl);
+}
+
+.impact-reveal {
+  text-align: center;
+}
+
+.impact-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  background: transparent;
+  color: var(--color-blue-700);
+  border: 1.5px solid var(--color-blue-500);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.impact-toggle:hover {
+  background: var(--color-blue-100);
+  transform: translateY(-2px);
+}
+
+.impact-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: max-height var(--duration-slow) var(--ease-standard),
+    opacity var(--duration-slow) var(--ease-standard),
+    margin-top var(--duration-slow) var(--ease-standard);
+}
+
+.impact-badges.is-visible {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: var(--space-lg);
+}
+
+.impact-badge {
+  background: var(--color-orange-100);
+  color: var(--color-orange-600);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+}
+
+@media (max-width: 640px) {
+  .pipeline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pipeline__label {
+    flex: none;
+  }
+}

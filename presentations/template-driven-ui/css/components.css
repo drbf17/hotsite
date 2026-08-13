@@ -1,0 +1,130 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.75em;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--color-orange-100);
+  color: var(--color-orange-600);
+}
+
+.badge--blue {
+  background: var(--color-blue-100);
+  color: var(--color-blue-700);
+}
+
+.badge--solid {
+  background: var(--color-blue-700);
+  color: var(--color-white);
+}
+
+.badge__dot {
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.icon-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-fill {
+  fill: currentColor;
+}
+
+.back-to-menu {
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5em 1em;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 10, 31, 0.45);
+  backdrop-filter: blur(6px);
+  color: var(--color-white);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.back-to-menu:hover {
+  background: rgba(6, 10, 31, 0.7);
+}
+
+/* ---- Lista de especificações técnicas ---- */
+.spec-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: var(--space-sm);
+}
+
+.spec-list li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
+  color: var(--color-text-secondary);
+}
+
+.spec-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--color-blue-500);
+  font-weight: 700;
+}
+
+/* ---- Callout de destaque ---- */
+.callout {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-orange-100);
+  color: var(--color-orange-600);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: var(--lh-normal);
+}
+
+/* ---- Pergunta retórica em destaque ---- */
+.rhetorical-quote {
+  max-width: 40rem;
+  margin: 0 auto var(--space-2xl);
+  padding-inline: var(--space-lg);
+  text-align: center;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  color: var(--color-blue-900);
+}
+
+.rhetorical-quote::before {
+  content: "“";
+  display: block;
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  color: var(--color-orange-500);
+  margin-bottom: var(--space-xs);
+}
+
+@media (max-width: 640px) {
+  .rhetorical-quote {
+    font-size: var(--fs-md);
+  }
+}

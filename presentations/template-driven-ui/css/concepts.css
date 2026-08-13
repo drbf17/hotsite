@@ -1,0 +1,95 @@
+.concepts-section {
+  background: var(--color-white);
+}
+
+.concepts-spectrum {
+  display: flex;
+  align-items: center;
+  max-width: 640px;
+  margin: 0 auto var(--space-xl);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  gap: var(--space-sm);
+}
+
+.concepts-spectrum__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-orange-500), var(--color-blue-500), var(--color-blue-700));
+}
+
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+
+.concept-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-white-soft);
+  border: 1px solid var(--color-white-mute);
+  transition: transform var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.concept-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.concept-card--featured {
+  background: linear-gradient(160deg, var(--color-blue-100), var(--color-white-soft) 60%);
+  border-color: var(--color-blue-100);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 901px) {
+  .concept-card--featured {
+    transform: scale(1.04);
+  }
+
+  .concept-card--featured:hover {
+    transform: scale(1.04) translateY(-4px);
+  }
+}
+
+.concept-card__title {
+  font-size: var(--fs-md);
+  color: var(--color-blue-900);
+  margin: var(--space-sm) 0 var(--space-xs);
+}
+
+.concept-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+}
+
+.concept-card__indication {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--color-blue-700);
+  margin-top: var(--space-sm);
+}
+
+.concept-card__footer {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+@media (max-width: 900px) {
+  .concepts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .concept-card--featured {
+    order: -1;
+  }
+}
