@@ -47,19 +47,19 @@
 
 @keyframes pipeline-step-active {
   0%, 8% {
-    background: var(--color-white-mute);
+    background-color: var(--color-white-mute);
     color: var(--color-text-secondary);
     transform: scale(1);
     box-shadow: none;
   }
   18%, 30% {
-    background: var(--step-color, var(--color-blue-500));
+    background-color: var(--step-color, var(--color-blue-500));
     color: var(--color-white);
     transform: scale(1.08);
     box-shadow: var(--shadow-sm);
   }
   40%, 100% {
-    background: var(--color-white-mute);
+    background-color: var(--color-white-mute);
     color: var(--color-text-secondary);
     transform: scale(1);
     box-shadow: none;
