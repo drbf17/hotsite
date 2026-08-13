@@ -50,7 +50,29 @@
   background: var(--color-white-mute);
   padding: 0.4rem 0.75rem;
   border-radius: var(--radius-pill);
+  transition: transform var(--duration-fast) var(--ease-standard);
 }
+
+/* Cor de destaque por posição no ciclo — compartilhada com o mini-ciclo do roadmap */
+.pipeline__step--1 { --step-color: #ff7a1a; }
+.pipeline__step--2 { --step-color: #2f6df0; }
+.pipeline__step--3 { --step-color: #2fb8a6; }
+.pipeline__step--4 { --step-color: #8a5cf6; }
+.pipeline__step--5 { --step-color: #ef5da8; }
+
+/* Sequência "acesa" em loop, indicando as etapas em execução uma após a outra */
+#cenario.in-view .pipeline__step {
+  animation-name: pipeline-step-active;
+  animation-duration: 4.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+#cenario.in-view .pipeline__step--1 { animation-delay: 0s; }
+#cenario.in-view .pipeline__step--2 { animation-delay: 0.9s; }
+#cenario.in-view .pipeline__step--3 { animation-delay: 1.8s; }
+#cenario.in-view .pipeline__step--4 { animation-delay: 2.7s; }
+#cenario.in-view .pipeline__step--5 { animation-delay: 3.6s; }
 
 .pipeline__arrow {
   color: var(--color-orange-500);

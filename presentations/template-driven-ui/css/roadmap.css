@@ -69,6 +69,38 @@
   margin-bottom: var(--space-sm);
 }
 
+/* Mini-ciclo dentro do phase-card: mesmo componente de .pipeline (scenario.css), versão compacta */
+.pipeline--compact {
+  padding: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.pipeline--compact .pipeline__label {
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+}
+
+.pipeline--compact .pipeline__steps {
+  gap: 0.3rem;
+}
+
+.pipeline--compact .pipeline__step {
+  font-size: var(--fs-xs);
+  padding: 0.35rem 0.6rem;
+}
+
+#roadmap.in-view .pipeline__step {
+  animation-name: pipeline-step-active;
+  animation-duration: 3.6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+#roadmap.in-view .pipeline__step--1 { animation-delay: 0s; }
+#roadmap.in-view .pipeline__step--2 { animation-delay: 0.9s; }
+#roadmap.in-view .pipeline__step--3 { animation-delay: 1.8s; }
+#roadmap.in-view .pipeline__step--4 { animation-delay: 2.7s; }
+
 @media (max-width: 900px) {
   .roadmap {
     flex-direction: column;
