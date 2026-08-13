@@ -51,13 +51,18 @@
   background: var(--color-blue-700);
 }
 
+.roi-compare__fill--mid {
+  width: 34%;
+  background: var(--color-blue-500);
+}
+
 .roi-compare__fill--after {
-  width: 28%;
+  width: 12%;
   background: var(--color-orange-500);
 }
 
 .roi-compare__value {
-  flex: 0 0 84px;
+  flex: 0 0 108px;
   font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--color-text-secondary);
