@@ -101,6 +101,11 @@
 #roadmap.in-view .pipeline__step--3 { animation-delay: 1.8s; }
 #roadmap.in-view .pipeline__step--4 { animation-delay: 2.7s; }
 
+/* Ciclo de 3 etapas (No Code): mesmo ritmo por etapa, cadência total mais curta */
+#roadmap.in-view .pipeline--cycle-3 .pipeline__step {
+  animation-duration: 2.7s;
+}
+
 @media (max-width: 900px) {
   .roadmap {
     flex-direction: column;
