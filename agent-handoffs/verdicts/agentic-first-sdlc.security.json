@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "SecurityVerdict",
+  "spec_id": "agentic-first-sdlc",
+  "verdict": "PASS",
+  "produced_by": { "agent": "verify-gate", "model_version": "claude-sonnet-5" },
+  "produced_at": "2026-08-23T00:00:00Z",
+  "precondition_status": {
+    "sealed_spec_present": false,
+    "verification_log_present": false,
+    "note": "Gates run against the v0 RAW spec. spec-judge halted at iteration 1 (avg 0.41 / max 0.70) and never sealed; no Stage 3 VerificationLog exists. Verdict scope is limited accordingly."
+  },
+  "checks": [
+    { "id": "sast", "tool": "semgrep --config auto", "result": "PASS", "findings": 0,
+      "note": "One Blocking finding (detect-non-literal-regexp) was raised against scripts/verify-agentic-first-sdlc.cjs during this gate and fixed at source by replacing the constructed RegExp with a literal lowercased includes(). Not suppressed, not waived." },
+    { "id": "secrets-scan", "result": "PASS",
+      "note": "3 grep hits reviewed and dismissed as false positives: the Portuguese word 'tokens' in prose about LLM context and the filename tokens.css." },
+    { "id": "dependency-review", "result": "PASS",
+      "note": "No dependencies added. Build-free static site with no package.json or lockfile, per agentic.config.yaml runtime notes." },
+    { "id": "owasp-top-10", "result": "NOT_APPLICABLE",
+      "note": "Spec declares pii:false. Static public content, no user input, no forms, no network calls." }
+  ],
+  "findings": [],
+  "blocking_findings": 0
+}

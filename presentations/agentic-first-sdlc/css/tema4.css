@@ -1,0 +1,121 @@
+.tema4-section {
+  background: var(--color-white);
+}
+
+.paradox-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: var(--space-lg);
+  max-width: 980px;
+  margin: 0 auto var(--space-lg);
+}
+
+.paradox-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--color-text-secondary);
+}
+
+.paradox-card {
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-white-mute);
+}
+
+.paradox-card--a {
+  background: linear-gradient(160deg, var(--color-orange-100), var(--color-white) 65%);
+}
+
+.paradox-card--b {
+  background: linear-gradient(160deg, var(--color-blue-100), var(--color-white) 65%);
+}
+
+.paradox-card__label {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.paradox-card--a .paradox-card__label {
+  color: var(--color-orange-600);
+}
+
+.paradox-card--b .paradox-card__label {
+  color: var(--color-blue-700);
+}
+
+.paradox-card__text {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.paradox-resolution {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-blue-900);
+  color: var(--color-white);
+  text-align: center;
+}
+
+.paradox-resolution__title {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  margin-bottom: var(--space-sm);
+}
+
+.paradox-resolution__text {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: var(--lh-normal);
+}
+
+/* Técnica complementar aos módulos profundos: mesma largura do bloco de
+   resolução, com peso visual menor por ser desdobramento e não conclusão. */
+.slice-note {
+  max-width: 780px;
+  margin: var(--space-lg) auto 0;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-white-soft);
+  border: 1px solid var(--color-white-mute);
+}
+
+.slice-note__title {
+  font-size: var(--fs-md);
+  color: var(--color-blue-900);
+  margin-bottom: var(--space-sm);
+}
+
+.slice-note__text {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.slice-note__text + .slice-note__text {
+  margin-top: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+  .paradox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .paradox-vs {
+    padding: var(--space-xs) 0;
+  }
+
+  .slice-note {
+    padding: var(--space-md);
+  }
+}

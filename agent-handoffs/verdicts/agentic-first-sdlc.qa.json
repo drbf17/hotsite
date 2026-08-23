@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "QAVerdict",
+  "spec_id": "agentic-first-sdlc",
+  "verdict": "PASS_WITH_CAVEATS",
+  "produced_by": { "agent": "verify-gate", "model_version": "claude-sonnet-5" },
+  "produced_at": "2026-08-23T00:00:00Z",
+  "precondition_status": {
+    "sealed_spec_present": false,
+    "verification_log_present": false,
+    "note": "ACs are taken from the v0 RAW spec plus editorial requirements agreed with the PO during review. They are NOT hash-pinned to a sealed artifact, so the usual 'ACs mapped to >=1 test: 100%' guarantee is asserted against an unsealed, mutable source."
+  },
+  "coverage": {
+    "instrumented_line_branch_coverage": "NOT_MEASURED",
+    "note": "No coverage instrumentation exists in this build-free repo. Verification is behavioural/e2e via a real Chromium instance rather than instrumented unit coverage. Line, branch and mutation floors are therefore not evaluable and are NOT claimed as met."
+  },
+  "e2e": {
+    "check_id": "e2e-agentic-first-sdlc",
+    "command": "NODE_PATH=\"$(npm root -g)\" node scripts/verify-agentic-first-sdlc.cjs",
+    "assertions": 28,
+    "result": "PASS",
+    "determinism": "5/5 deterministic runs, re-confirmed after the SAST fix",
+    "flaky_tests": 0
+  },
+  "ac_coverage": [
+    { "ac": "AC1 home listing renders the card with correct slug/href", "covered": true },
+    { "ac": "AC2 hero renders with webp/jpeg picture fallback and headline", "covered": true },
+    { "ac": "AC3 one section per theme, in source-document order", "covered": true },
+    { "ac": "AC4 scroll reveal fires via IntersectionObserver", "covered": true },
+    { "ac": "AC5 closing positioning statement present", "covered": true },
+    { "ac": "AC6 back link resolves to home without 404", "covered": true },
+    { "ac": "Edge: prefers-reduced-motion freezes the hero pan", "covered": true },
+    { "ac": "Edge: image-load failure falls back without breaking the hero", "covered": true },
+    { "ac": "Edge: no horizontal overflow at 375px; dense table scrolls in-container", "covered": true },
+    { "ac": "Editorial: zero em-dash, no exact numeric claims, only Uncle Bob and Matt Pocock named", "covered": true }
+  ],
+  "anti_tautology_note": "Assertions were written from the spec's acceptance criteria and the PO's review directives, not from the implementation's observed behaviour. One assertion initially failed by sampling opacity before the 600ms reveal transition completed; that was a defect in the test's timing model and was fixed with polling, not by relaxing the assertion to match current behaviour.",
+  "known_debt": [
+    {
+      "item": "typecheck check is RED repo-wide",
+      "detail": "7 TS2339 errors in js/selection.js, presentations/mudanca-para-negocio/js/video.js and presentations/template-driven-ui/js/practices.js. Confirmed pre-existing via an isolated git worktree at clean HEAD: identical errors, none in agentic-first-sdlc. This spec's own JS is in the typecheck program and passes clean.",
+      "owner": "unassigned",
+      "accepted_by": "drbf17@gmail.com (deferred during this gate run)"
+    }
+  ],
+  "blocking_findings": 0
+}

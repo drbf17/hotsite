@@ -1,0 +1,12 @@
+.intro-section {
+  background: var(--color-white);
+}
+
+.intro-note {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+  font-size: var(--fs-md);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+}
