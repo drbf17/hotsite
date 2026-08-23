@@ -11,6 +11,13 @@ amendments:
   - amended_at: "2026-08-22T23:10:00Z"
     amended_by: "frontend-dev (build phase, hero-lateral-travelling-photos)"
     reason: "added e2e-hero-pan check to validate the sealed spec's acceptance criteria in a real browser"
+  - amended_at: "2026-08-23T00:00:00Z"
+    amended_by: "verify-gate (agentic-first-sdlc)"
+    reason: >
+      The agentic-first-sdlc presentation shipped with zero automated
+      coverage: e2e-hero-pan is scoped to the other two presentations, so
+      the QA pass had nothing to assert against. Added e2e-agentic-first-sdlc
+      to close that gap before running the gates.
   - amended_at: "2026-08-22T23:20:00Z"
     amended_by: "verify-gate fix-up (hero-lateral-travelling-photos)"
     reason: >
@@ -131,5 +138,32 @@ payload:
         repo; the script is CommonJS specifically so NODE_PATH (which only
         CJS `require` honors, not ESM `import`) can resolve the global
         install. Excluded from dev-loop due to its ~5s Chromium startup cost.
+
+    - id: e2e-agentic-first-sdlc
+      category: e2e
+      command: "NODE_PATH=\"$(npm root -g)\" node scripts/verify-agentic-first-sdlc.cjs"
+      pass_when: "exit_code == 0"
+      enforcement: blocking
+      scope: "presentations/agentic-first-sdlc/**, js/presentations-data.js"
+      runs_in: [pre-push, gate]
+      verified_at: "2026-08-23T00:00:00Z"
+      typical_duration_seconds: 6
+      note: >
+        Closes the QA-coverage gap for the agentic-first-sdlc presentation,
+        which the e2e-hero-pan check does not cover (that one is scoped to
+        mudanca-para-negocio and template-driven-ui only). 28 assertions over
+        a real Chromium instance: home-listing card wiring, hero picture/webp
+        fallback and load, section presence and DOM order, removed sections
+        staying removed, scroll-reveal actually firing, prefers-reduced-motion
+        freezing the pan, image-load failure fallback, no horizontal overflow
+        at 375px, and the editorial invariants agreed in review (zero em-dash,
+        no exact numeric claims, only Uncle Bob and Matt Pocock named).
+        Verified 5/5 deterministic. Same externally-installed-prerequisite
+        pattern as e2e-hero-pan: requires a one-time
+        `npm install -g playwright && npx --yes playwright install chromium`.
+        CAVEAT: asserts against the v0 RAW spec, not a sealed one — the
+        spec-judge run stopped at iteration 1 (avg 0.41 / max 0.70, above the
+        seal thresholds), so these encode requirements as agreed with the PO
+        in review and must be revisited if the spec is later sealed.
 
   waivers: []
