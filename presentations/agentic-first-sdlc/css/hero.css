@@ -1,0 +1,138 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: var(--color-text-inverse);
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 15%, rgba(161, 61, 124, 0.35), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 82% 10%, rgba(58, 33, 102, 0.4), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 100%, var(--scene-space-mid), transparent 70%),
+    var(--scene-space-deep);
+}
+
+/* ---- Foto do hero (travelling lateral em CSS puro) ---- */
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero__photo-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 140%;
+  height: 100%;
+  animation: hero-pan 20s ease-in-out infinite alternate;
+}
+
+.hero__photo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes hero-pan {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-25%); }
+}
+
+/* Fallback de erro de carregamento da imagem: fundo sólido, sem cena SVG */
+.hero__photo--error {
+  background: var(--color-blue-900);
+}
+
+.hero__photo--error .hero__photo-frame {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__photo-frame {
+    animation: none;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* ---- Scrim + conteúdo ---- */
+.hero__scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 48%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--scene-space-deep) 82%);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 3;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding: 0 var(--container-pad) var(--space-2xl);
+  text-align: center;
+  animation: headline-in var(--duration-slow) var(--ease-standard) both;
+  animation-delay: 0.15s;
+}
+
+.hero__eyebrow {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-orange-400);
+  margin-bottom: var(--space-sm);
+}
+
+.hero__headline {
+  font-size: clamp(1.9rem, 5.2vh, var(--fs-3xl));
+  line-height: var(--lh-tight);
+  font-weight: 800;
+  margin-bottom: var(--space-md);
+}
+
+.hero__subheadline {
+  font-size: var(--fs-md);
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: var(--space-lg);
+}
+
+.hero__scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hero__scroll-cue-line {
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.5);
+  animation: scroll-bounce 1.8s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  .hero { min-height: 92vh; }
+  .hero__content { padding-bottom: var(--space-xl); }
+}
+
+@media (max-height: 820px) {
+  .hero__content { padding-bottom: var(--space-lg); }
+  .hero__subheadline { margin-bottom: var(--space-md); }
+}
+
+@media (max-height: 680px) {
+  .hero__scroll-cue { display: none; }
+}

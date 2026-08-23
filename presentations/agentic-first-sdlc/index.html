@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentic-First SDLC: fundamentos de engenharia na era dos agentes</title>
+<meta name="description" content="Fundamentos de engenharia de software na era dos agentes de IA: validações determinísticas, módulos profundos, granularidade multiagente e o paradoxo da abstração." />
+<link rel="stylesheet" href="css/reset.css" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/hero.css" />
+<link rel="stylesheet" href="css/intro.css" />
+<link rel="stylesheet" href="css/tema1.css" />
+<link rel="stylesheet" href="css/tema2.css" />
+<link rel="stylesheet" href="css/tema3.css" />
+<link rel="stylesheet" href="css/tema4.css" />
+<link rel="stylesheet" href="css/tema5.css" />
+<link rel="stylesheet" href="css/tema6.css" />
+<link rel="stylesheet" href="css/tema7.css" />
+<link rel="stylesheet" href="css/tensoes.css" />
+<link rel="stylesheet" href="css/positioning.css" />
+<link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+<a class="back-to-menu" href="../../index.html">&larr; Apresentações</a>
+
+<section id="hero" class="hero">
+  <div class="hero__photo" aria-hidden="true">
+    <picture class="hero__photo-frame">
+      <source srcset="assets/hero.webp" type="image/webp" />
+      <img
+        class="hero__photo-img"
+        src="assets/hero.jpeg"
+        alt=""
+        loading="eager"
+        fetchpriority="high"
+        width="1376"
+        height="768"
+        onerror="this.closest('.hero__photo').classList.add('hero__photo--error')"
+      />
+    </picture>
+  </div>
+
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__content">
+    <span class="hero__eyebrow">Engenharia de Software · Era dos Agentes</span>
+    <h1 class="hero__headline">Escrever código ficou barato. Confiar nele, não.</h1>
+    <p class="hero__subheadline">Para especialistas de mercado, o gargalo deixou de ser escrever código e passou a validar se cumpre os requisitos.</p>
+    <a class="hero__scroll-cue" href="#fio-condutor" aria-label="Rolar para a seção Fio Condutor">
+      <span class="hero__scroll-cue-line"></span>
+      Explorar
+    </a>
+  </div>
+</section>
+
+<section id="fio-condutor" class="intro-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Fio condutor</span>
+      <h2 class="section-heading__title">O gargalo mudou de lugar</h2>
+      <p class="section-heading__subtitle">Por caminhos distintos, especialistas de mercado chegam à mesma conclusão sobre onde está hoje o esforço de engenharia.</p>
+    </div>
+
+    <blockquote class="rhetorical-quote">A IA tornou o código barato de produzir e caro de validar.</blockquote>
+
+    <p class="intro-note">O esforço de engenharia migrou da escrita para a revisão, o teste e a validação. O ganho de produtividade não vem de modelos mais capazes, e sim do redesenho do processo em torno dessa nova distribuição de esforço. É por isso que os fundamentos de engenharia pesam mais agora, não menos.</p>
+  </div>
+</section>
+
+<section id="tema-1" class="tema1-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 1</span>
+      <h2 class="section-heading__title">Entendimento compartilhado antes do código</h2>
+      <p class="section-heading__subtitle">O alinhamento conceitual com a IA precisa acontecer antes da implementação, não depois de constatar divergência no resultado.</p>
+    </div>
+
+    <div class="pair-grid">
+      <article class="pair-card" data-animate="1">
+        <h3 class="pair-card__title">A técnica grill me</h3>
+        <p class="pair-card__desc">Proposta por Matt Pocock: o modelo entrevista o desenvolvedor até que ambos convirjam sobre o que será construído. A direção da interrogação se inverte em relação à prática usual, cabendo ao modelo questionar o humano.</p>
+      </article>
+      <article class="pair-card" data-animate="2">
+        <h3 class="pair-card__title">Vocabulário ubíquo</h3>
+        <p class="pair-card__desc">Conceito herdado do Domain-Driven Design: um glossário explícito de termos, compartilhado entre desenvolvedor e IA. Um termo empregado em dois sentidos distintos representa um defeito ainda não manifestado.</p>
+      </article>
+    </div>
+
+    <p class="callout tema1-callout">Esta é a fundamentação do estágio de Spec Judge: a inversão proposta pela técnica grill me corresponde ao loop de grilagem, e o vocabulário ubíquo é o que a pontuação de ambiguidade busca assegurar de forma quantitativa.</p>
+  </div>
+</section>
+
+<section id="tema-2" class="tema2-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 2</span>
+      <h2 class="section-heading__title">Validações determinísticas trazem melhores resultados</h2>
+      <p class="section-heading__subtitle">Requisitos de qualidade declarados no prompt têm caráter consultivo. Implementados como verificação automatizada, tornam-se condição de aprovação.</p>
+    </div>
+
+    <div class="mechanism-grid">
+      <article class="mechanism-card" data-animate="1">
+        <h3 class="mechanism-card__title">CRAP Score</h3>
+        <p class="mechanism-card__desc">Cruza complexidade com cobertura de testes. Identifica a interseção crítica entre as duas dimensões: código complexo e insuficientemente testado, que nenhuma das métricas isoladas revela.</p>
+      </article>
+      <article class="mechanism-card" data-animate="2">
+        <h3 class="mechanism-card__title">Teste de Mutação</h3>
+        <p class="mechanism-card__desc">Introduz alterações controladas no código para avaliar a suíte de testes. Se os testes seguem aprovados, eles executam o código sem de fato verificar seu comportamento.</p>
+      </article>
+      <article class="mechanism-card" data-animate="3">
+        <h3 class="mechanism-card__title">Análise Arquitetural</h3>
+        <p class="mechanism-card__desc">Detecta a degradação estrutural que não é capturada por nenhuma suíte de testes unitários.</p>
+      </article>
+    </div>
+
+    <div class="eval-panel" data-animate="4">
+      <span class="eval-panel__label">Validação da saída do agente</span>
+      <h3 class="eval-panel__title">Evals: o gate que falta quando o produto é não-determinístico</h3>
+      <p class="eval-panel__text">As validações acima verificam o código produzido. Evals verificam o comportamento do próprio agente, que é probabilístico por natureza: a mesma entrada pode gerar saídas distintas a cada execução, e um teste tradicional de aprovação binária não captura essa variação.</p>
+      <p class="eval-panel__text">Um conjunto de evals é uma suíte versionada de casos representativos, com critérios explícitos de avaliação, executada a cada alteração de prompt, modelo ou ferramenta. É o que transforma a percepção subjetiva de que o agente melhorou em evidência comparável entre versões, e o que permite detectar regressão de qualidade antes que ela chegue à produção.</p>
+      <p class="eval-panel__text eval-panel__text--em">Sem evals, toda mudança de prompt é uma aposta cujo resultado só aparece em produção.</p>
+    </div>
+
+    <p class="callout tema2-callout">Este é o argumento central de Uncle Bob. Um agente sob pressão de contexto tende a racionalizar; uma validação determinística não possui contexto a ser persuadido. O CRAP Score ainda não integra o conjunto de gates atual, embora enderece justamente a interseção entre complexidade e cobertura, hoje medida em eixos separados.</p>
+  </div>
+</section>
+
+<section id="tema-3" class="tema3-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 3</span>
+      <h2 class="section-heading__title">O leitor primário do código agora é uma máquina</h2>
+      <p class="section-heading__subtitle">Na leitura de Uncle Bob, humanos leem código para recuperar intenção; agentes leem código para processar tokens. O alvo da otimização se desloca.</p>
+    </div>
+
+    <div class="impact-list">
+      <div class="impact-row" data-animate="1">
+        <span class="impact-row__badge impact-row__badge--wash">Neutro</span>
+        <div class="impact-row__body">
+          <p class="impact-row__title">Funções pequenas</p>
+          <p class="impact-row__desc">Não apresentam impacto mensurável para um leitor automatizado, em nenhuma das direções.</p>
+        </div>
+      </div>
+      <div class="impact-row" data-animate="2">
+        <span class="impact-row__badge impact-row__badge--bigwin">Alto impacto</span>
+        <div class="impact-row__body">
+          <p class="impact-row__title">Facilidade de busca no código</p>
+          <p class="impact-row__desc">Organizar o código para ser facilmente pesquisável reduz de forma expressiva o consumo de tokens. Nomes distintos e pesquisáveis superam nomenclaturas curtas e pouco explícitas.</p>
+        </div>
+      </div>
+      <div class="impact-row" data-animate="3">
+        <span class="impact-row__badge impact-row__badge--gain">Positivo</span>
+        <div class="impact-row__body">
+          <p class="impact-row__title">Arquivos de responsabilidade única</p>
+          <p class="impact-row__desc">Reduzem o volume de contexto irrelevante que o agente precisa carregar para executar qualquer tarefa.</p>
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="rhetorical-quote">Módulos profundos encapsulam ampla funcionalidade sob uma interface simples, o que facilita tanto a navegação quanto a verificação pela interface.</blockquote>
+  </div>
+</section>
+
+<section id="tema-4" class="tema4-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 4</span>
+      <h2 class="section-heading__title">O paradoxo da abstração</h2>
+      <p class="section-heading__subtitle">A controvérsia mais relevante do tema: camadas de arquitetura favorecem ou prejudicam a atuação de um agente?</p>
+    </div>
+
+    <div class="paradox-grid">
+      <article class="paradox-card paradox-card--a" data-animate="1">
+        <span class="paradox-card__label">Contra o excesso de camadas</span>
+        <p class="paradox-card__text">A adoção de Clean Architecture por convenção, e não por necessidade efetiva, impõe custos concretos de carga cognitiva e consumo de contexto. O chamado Paradoxo da Navegação indica que múltiplas camadas e interfaces degradam a navegação e a precisão do agente.</p>
+      </article>
+      <span class="paradox-vs" aria-hidden="true">vs</span>
+      <article class="paradox-card paradox-card--b" data-animate="2">
+        <span class="paradox-card__label">Uncle Bob</span>
+        <p class="paradox-card__text">Módulos bem definidos e interfaces claras são justamente o que permite ao modelo compreender o contexto sem sobrecarregar janelas de contexto extensas.</p>
+      </article>
+    </div>
+
+    <div class="paradox-resolution" data-animate="3">
+      <h3 class="paradox-resolution__title">A convergência: módulos profundos</h3>
+      <p class="paradox-resolution__text">Não se trata de um meio-termo, e sim da dissolução do conflito. Cada posição endereça uma falha distinta: de um lado, a ausência completa de fronteiras; de outro, o empilhamento cerimonial de fronteiras que não encapsulam decisão alguma. Um módulo profundo combina fronteira sólida e poucos saltos de navegação, atendendo a ambos os critérios. O parâmetro de avaliação passa a ser o quanto uma fronteira encapsula, e não sua mera existência.</p>
+    </div>
+
+    <div class="slice-note" data-animate="4">
+      <h3 class="slice-note__title">Vertical slice: isolar a funcionalidade para reduzir o contexto</h3>
+      <p class="slice-note__text">O vertical slice organiza o código por funcionalidade completa, reunindo no mesmo limite tudo o que uma capacidade de negócio exige, da interface à persistência. A alternativa é a organização por camada técnica, que espalha uma única funcionalidade por diretórios distintos e obriga o agente a percorrer a base inteira para reunir o que precisa.</p>
+      <p class="slice-note__text">O efeito prático é a redução direta do contexto necessário por tarefa: alterar uma funcionalidade passa a exigir a leitura de um recorte coeso, e não de fragmentos dispersos em várias camadas. A fronteira acompanha o domínio, o que reduz a superfície exposta sem eliminar o encapsulamento.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tema-5" class="tema5-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 5</span>
+      <h2 class="section-heading__title">Granularidade multiagente tem um ponto ótimo</h2>
+      <p class="section-heading__subtitle">A qualidade do resultado não decorre do número de agentes, e sim do agrupamento adequado das tarefas.</p>
+    </div>
+
+    <div class="agent-compare" role="img" aria-label="Comparação de configurações de subagentes: a fragmentação máxima, com um subagente por tarefa pequena, resulta em execução mais lenta e perda de qualidade; o agrupamento por fases coesas alcança a melhor qualidade sem custo de velocidade; o agente único serve de referência de velocidade, com menor flexibilidade de correção">
+      <div class="agent-compare__row" data-animate="1">
+        <span class="agent-compare__label">Fragmentação máxima</span>
+        <span class="agent-compare__track"><span class="agent-compare__fill agent-compare__fill--low"></span></span>
+        <span class="agent-compare__value">mais lento, com perda de qualidade</span>
+      </div>
+      <div class="agent-compare__row" data-animate="2">
+        <span class="agent-compare__label">Agrupamento por fases coesas</span>
+        <span class="agent-compare__track"><span class="agent-compare__fill agent-compare__fill--sweet"></span></span>
+        <span class="agent-compare__value">melhor qualidade, sem custo de velocidade</span>
+      </div>
+      <div class="agent-compare__row" data-animate="3">
+        <span class="agent-compare__label">Agente único</span>
+        <span class="agent-compare__track"><span class="agent-compare__fill agent-compare__fill--mid"></span></span>
+        <span class="agent-compare__value">velocidade de referência, menor flexibilidade</span>
+      </div>
+    </div>
+
+    <div class="guidance-list">
+      <div class="guidance-row" data-animate="1">
+        <p class="guidance-row__condition">Pesquisa e varredura de base de código, além de tarefas extensas com paralelização efetiva.</p>
+        <span class="badge badge--blue"><span class="badge__dot"></span>Adote subagentes</span>
+      </div>
+      <div class="guidance-row" data-animate="2">
+        <p class="guidance-row__condition">Trabalho fortemente acoplado e tarefas de curta duração.</p>
+        <span class="badge"><span class="badge__dot"></span>Evite subagentes</span>
+      </div>
+    </div>
+
+    <p class="tema5-note">A fragmentação excessiva do contexto custa mais em capacidade de raciocínio do que se ganha em paralelismo. Existe um ponto ótimo entre esses dois extremos, mas ele não é um número universal: depende da natureza do trabalho, do acoplamento entre as tarefas e do volume de contexto que cada fase exige. Cabe a cada equipe localizá-lo experimentalmente, avaliando qualidade e tempo de execução a cada ajuste de agrupamento, em vez de adotar uma configuração fixa por convenção.</p>
+  </div>
+</section>
+
+<section id="tema-6" class="tema6-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 6</span>
+      <h2 class="section-heading__title">Design de skills: quatro pilares</h2>
+      <p class="section-heading__subtitle">O framework proposto por Matt Pocock para manter skills sustentáveis à medida que crescem em número e complexidade.</p>
+    </div>
+
+    <div class="pillars-bento">
+      <article class="pillar-cell pillar-cell--trigger" data-animate="1">
+        <span class="pillar-cell__number">1</span>
+        <h3 class="pillar-cell__title">Gatilho</h3>
+        <p class="pillar-cell__desc">A invocação pelo usuário oferece maior controle, com mais carga cognitiva para quem opera. A invocação pelo modelo amplia a flexibilidade e reduz a previsibilidade. Trata-se de uma decisão deliberada de projeto.</p>
+      </article>
+      <article class="pillar-cell pillar-cell--structure" data-animate="2">
+        <span class="pillar-cell__number">2</span>
+        <h3 class="pillar-cell__title">Estrutura</h3>
+        <p class="pillar-cell__desc">Separe o procedimento do material de apoio, mantendo o arquivo principal da skill o mais enxuto possível e referenciando o conteúdo complementar à parte.</p>
+      </article>
+      <article class="pillar-cell pillar-cell--steering" data-animate="3">
+        <span class="pillar-cell__number">3</span>
+        <h3 class="pillar-cell__title">Direcionamento</h3>
+        <p class="pillar-cell__desc">Utilize palavras-chave de comando para orientar o raciocínio do agente e decomponha processos complexos em skills menores, assegurando maior profundidade em cada etapa.</p>
+      </article>
+      <article class="pillar-cell pillar-cell--pruning" data-animate="4">
+        <span class="pillar-cell__number">4</span>
+        <h3 class="pillar-cell__title">Poda</h3>
+        <p class="pillar-cell__desc">Remova sistematicamente conteúdo obsoleto, redundâncias e instruções que não produzem efeito sobre o comportamento do agente.</p>
+      </article>
+    </div>
+
+    <p class="callout tema6-callout">A poda é uma disciplina de manutenção contínua: prompts e templates acumulam conteúdo obsoleto por padrão, e sua revisão periódica precisa ter responsável definido.</p>
+  </div>
+</section>
+
+<section id="tema-7" class="tema7-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Tema 7</span>
+      <h2 class="section-heading__title">Estratégia é humana, tática é da máquina</h2>
+      <p class="section-heading__subtitle">Ponto de consenso entre os especialistas, formulado em termos praticamente idênticos.</p>
+    </div>
+
+    <div class="strategy-split">
+      <article class="strategy-col strategy-col--human" data-animate="1">
+        <span class="strategy-col__label">Humano</span>
+        <h3 class="strategy-col__title">Estratégia</h3>
+        <p class="strategy-col__desc">Desenho de sistema e arquitetura, sustentados como investimento diário e não como decisão pontual. A supervisão de um agente pressupõe um nível de compreensão que não pode ser abreviado.</p>
+      </article>
+      <div class="strategy-divider" aria-hidden="true"></div>
+      <article class="strategy-col strategy-col--machine" data-animate="2">
+        <span class="strategy-col__label">IA</span>
+        <h3 class="strategy-col__title">Tática</h3>
+        <p class="strategy-col__desc">Excelente executor tático: realiza tarefas e produz código com alta velocidade. Sem mecanismos de contenção, entrega rapidez às custas de organização e consistência estrutural.</p>
+      </article>
+    </div>
+
+    <p class="tema7-note">Uncle Bob acrescenta uma ressalva sobre formação: profissionais em início de carreira devem cumprir um período de prática manual efetiva para compreender o código antes de supervisionar um agente com competência. A restrição do processo não está na velocidade, e sim na contenção.</p>
+  </div>
+</section>
+
+<section id="tensoes" class="tensoes-section section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Pontos em aberto</span>
+      <h2 class="section-heading__title">Principais controvérsias entre os especialistas</h2>
+      <p class="section-heading__subtitle">É nas divergências que residem as decisões de projeto que cada equipe precisa tomar de forma consciente.</p>
+    </div>
+
+    <div class="tension-table-wrap">
+      <table class="tension-table">
+        <thead>
+          <tr>
+            <th scope="col">Controvérsia</th>
+            <th scope="col">Posição A</th>
+            <th scope="col">Posição B</th>
+            <th scope="col">Leitura</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Camadas</td>
+            <td>Uncle Bob: módulos e interfaces claras protegem o modelo da sobrecarga de contexto.</td>
+            <td>Camadas e interfaces degradam de forma mensurável a navegação da IA.</td>
+            <td>Endereçado por módulos profundos: avalie a fronteira pelo que ela encapsula, não por sua existência.</td>
+          </tr>
+          <tr>
+            <td>Granularidade de módulo</td>
+            <td>Arquivos focados e de responsabilidade única reduzem o carregamento de contexto irrelevante.</td>
+            <td>Módulos profundos desaconselham a multiplicação de módulos pequenos e rasos.</td>
+            <td>Ambas as posições se opõem à superfície rasa: o problema é a área de superfície exposta, não o tamanho.</td>
+          </tr>
+          <tr>
+            <td>Valor do multiagente</td>
+            <td>A arquitetura multiagente eleva a qualidade do resultado.</td>
+            <td>A fragmentação de contexto representa risco concreto ao resultado.</td>
+            <td>A variável mensurada é o agrupamento em fases coesas, não o número de agentes.</td>
+          </tr>
+          <tr>
+            <td>A capacidade do modelo é determinante?</td>
+            <td>Superado certo limiar, modelos mais capazes alteram pouco a rotina de trabalho.</td>
+            <td>A premissa do workflow agentic pressupõe que a capacidade do modelo viabiliza o processo.</td>
+            <td>As posições não se excluem: a alavanca está no desenho do processo, o que justifica formalizar o workflow em especificação.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="fechamento" class="positioning-section section">
+  <div class="container">
+    <div class="positioning">
+      <span class="positioning__eyebrow">Posicionamento</span>
+      <h2 class="positioning__statement">Com IA, os fundamentos de engenharia se tornaram mais determinantes, não menos.</h2>
+      <p class="positioning__body">O gargalo deixou de ser escrever código e passou a ser assegurar que ele cumpre os requisitos. Validações determinísticas, módulos profundos e fases de execução bem delimitadas são a resposta estrutural a essa mudança, e não formalidade de processo.</p>
+    </div>
+  </div>
+</section>
+
+<script src="js/main.js"></script>
+</body>
+</html>

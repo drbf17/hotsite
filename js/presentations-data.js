@@ -10,6 +10,12 @@ window.PRESENTATIONS = [
     title: 'Template Driven UI',
     description: 'Como uma arquitetura orientada a templates reduz time to market, custo de engenharia e fragmentação de experiência.',
     href: 'presentations/template-driven-ui/index.html'
+  },
+  {
+    slug: 'agentic-first-sdlc',
+    title: 'Agentic-First SDLC',
+    description: 'Fundamentos de engenharia na era dos agentes de IA: validações determinísticas, módulos profundos e o ponto ideal de granularidade multiagente.',
+    href: 'presentations/agentic-first-sdlc/index.html'
   }
 
   // Para adicionar uma nova apresentação:
