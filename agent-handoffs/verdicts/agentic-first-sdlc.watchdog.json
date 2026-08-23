@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "WatchdogVerdict",
+  "spec_id": "agentic-first-sdlc",
+  "verdict": "PASS",
+  "produced_by": { "agent": "verify-gate", "model_version": "claude-sonnet-5" },
+  "produced_at": "2026-08-23T00:00:00Z",
+  "precondition_status": {
+    "sealed_spec_present": false,
+    "verification_log_present": false
+  },
+  "metrics": [
+    { "metric": "file LOC - stripped-markup", "file": "presentations/agentic-first-sdlc/index.html",
+      "value": 363, "soft": 550, "hard": 800, "result": "PASS" },
+    { "metric": "file LOC - logic", "file": "presentations/agentic-first-sdlc/js/main.js",
+      "value": 39, "soft": 400, "hard": 600, "result": "PASS" },
+    { "metric": "file LOC - logic", "file": "scripts/verify-agentic-first-sdlc.cjs",
+      "value": 258, "soft": 400, "hard": 600, "result": "PASS" },
+    { "metric": "file LOC - largest CSS", "file": "presentations/agentic-first-sdlc/css/hero.css",
+      "value": 138, "soft": 400, "hard": 600, "result": "PASS" },
+    { "metric": "cyclomatic complexity / max-depth / max-params / max-nested-callbacks",
+      "tool": "eslint --config eslint.static.config.mjs", "result": "PASS", "exit_code": 0 },
+    { "metric": "circular dependencies", "value": 0, "result": "PASS",
+      "evidence": "static-tool basis: no module system in play. The presentation ships plain classic <script> tags with no import/require graph; scripts/*.cjs require only Node builtins and the global playwright package." }
+  ],
+  "solid_findings": [],
+  "shallow_split_review": {
+    "flagged": false,
+    "note": "The bundle contains 15 CSS files, which superficially resembles a LOC-cap-driven shallow split. Reviewed and dismissed: no file approaches the 400-line soft cap (largest is 138), and one-file-per-section is the pre-existing convention in both sibling presentations. Split is convention-driven, not cap-driven; fan-out did not increase."
+  },
+  "sanctioned_debt_matches": [],
+  "blocking_findings": 0
+}
