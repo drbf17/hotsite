@@ -21,106 +21,20 @@
 <a class="back-to-menu" href="../../index.html">&larr; Apresentações</a>
 
 <section id="hero" class="hero">
-  <div class="hero__starfield" aria-hidden="true"></div>
-
-  <div class="hero__scene" aria-hidden="true">
-    <svg class="station-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ilustração de uma estação espacial montada, com um núcleo esférico brilhante e foguetes de diferentes cores acoplados a ela">
-      <defs>
-        <radialGradient id="hubGlow" cx="50%" cy="45%" r="65%">
-          <stop offset="0%" stop-color="#c3d8ff" />
-          <stop offset="55%" stop-color="#2f6df0" />
-          <stop offset="100%" stop-color="#0a1a3c" />
-        </radialGradient>
-
-        <radialGradient id="emblemGlow" cx="38%" cy="32%" r="75%">
-          <stop offset="0%" stop-color="#eaf2ff" />
-          <stop offset="35%" stop-color="#8fb4f5" />
-          <stop offset="70%" stop-color="#2f6df0" />
-          <stop offset="100%" stop-color="#123a8c" />
-        </radialGradient>
-
-        <g id="rocket-template">
-          <path class="rocket-fin" d="M -22,95 L -46,128 L -22,110 Z" />
-          <path class="rocket-fin" d="M 22,95 L 46,128 L 22,110 Z" />
-          <rect class="rocket-body" x="-22" y="40" width="44" height="70" rx="16" />
-          <path class="rocket-nose" d="M 0,0 C 10,10 18,26 18,40 L -18,40 C -18,26 -10,10 0,0 Z" />
-          <rect class="rocket-stripe" x="-22" y="78" width="44" height="14" />
-          <circle class="rocket-window" cx="0" cy="58" r="10" />
-          <circle class="rocket-window-highlight" cx="-3" cy="55" r="3" />
-          <g class="rocket-flame">
-            <ellipse class="rocket-flame-outer" cx="0" cy="126" rx="12" ry="22" />
-            <ellipse class="rocket-flame-core" cx="0" cy="120" rx="6" ry="13" />
-          </g>
-        </g>
-      </defs>
-
-      <!-- Painéis solares -->
-      <g transform="translate(500,400)">
-        <g class="solar-array solar-array--left">
-          <line class="truss" x1="-135" y1="0" x2="-330" y2="0" />
-          <rect class="panel" x="-330" y="-55" width="150" height="110" rx="6" />
-          <line class="panel-grid" x1="-300" y1="-55" x2="-300" y2="55" />
-          <line class="panel-grid" x1="-270" y1="-55" x2="-270" y2="55" />
-          <line class="panel-grid" x1="-240" y1="-55" x2="-240" y2="55" />
-          <line class="panel-grid" x1="-210" y1="-55" x2="-210" y2="55" />
-          <line class="panel-grid" x1="-180" y1="-55" x2="-180" y2="55" />
-          <line class="panel-grid panel-grid--h" x1="-330" y1="-18" x2="-180" y2="-18" />
-          <line class="panel-grid panel-grid--h" x1="-330" y1="18" x2="-180" y2="18" />
-        </g>
-        <g class="solar-array solar-array--right">
-          <line class="truss" x1="135" y1="0" x2="330" y2="0" />
-          <rect class="panel" x="180" y="-55" width="150" height="110" rx="6" />
-          <line class="panel-grid" x1="210" y1="-55" x2="210" y2="55" />
-          <line class="panel-grid" x1="240" y1="-55" x2="240" y2="55" />
-          <line class="panel-grid" x1="270" y1="-55" x2="270" y2="55" />
-          <line class="panel-grid" x1="300" y1="-55" x2="300" y2="55" />
-          <line class="panel-grid" x1="330" y1="-55" x2="330" y2="55" />
-          <line class="panel-grid panel-grid--h" x1="180" y1="-18" x2="330" y2="-18" />
-          <line class="panel-grid panel-grid--h" x1="180" y1="18" x2="330" y2="18" />
-        </g>
-      </g>
-
-      <!-- Antena -->
-      <g class="antenna" transform="translate(500,400)">
-        <line class="antenna-mast" x1="0" y1="-132" x2="0" y2="-230" />
-        <g class="antenna-pulse-wrap" transform="translate(0,-230)">
-          <circle class="antenna-ring" r="6" />
-          <circle class="antenna-ring antenna-ring--delay" r="6" />
-          <circle class="antenna-tip" r="6" />
-        </g>
-      </g>
-
-      <!-- Núcleo da estação -->
-      <g class="station-hub" transform="translate(500,400)">
-        <circle class="hub-ring-outer" r="132" />
-        <circle class="hub-ring-mid" r="104" />
-        <circle class="hub-core" r="72" fill="url(#hubGlow)" />
-        <g class="hub-emblem">
-          <circle r="58" fill="url(#emblemGlow)" />
-          <circle class="hub-emblem-ring" r="58" />
-        </g>
-        <circle class="hub-light" cx="0" cy="-118" r="6" style="animation-delay:0s" />
-        <circle class="hub-light" cx="102" cy="-58" r="6" style="animation-delay:.4s" />
-        <circle class="hub-light" cx="102" cy="58" r="6" style="animation-delay:.8s" />
-        <circle class="hub-light" cx="0" cy="118" r="6" style="animation-delay:1.2s" />
-        <circle class="hub-light" cx="-102" cy="58" r="6" style="animation-delay:1.6s" />
-        <circle class="hub-light" cx="-102" cy="-58" r="6" style="animation-delay:2s" />
-      </g>
-
-      <!-- Nós de acoplamento (docking) -->
-      <circle class="dock-node" cx="663" cy="237" r="8" />
-      <circle class="dock-node" cx="663" cy="563" r="8" />
-      <circle class="dock-node" cx="500" cy="630" r="8" />
-      <circle class="dock-node" cx="337" cy="563" r="8" />
-      <circle class="dock-node" cx="337" cy="237" r="8" />
-
-      <!-- Foguetes (mini-apps) acoplados, estáticos -->
-      <use href="#rocket-template" xlink:href="#rocket-template" class="rocket" style="--rocket-accent:#ff7a1a" transform="translate(663,237) rotate(225)" />
-      <use href="#rocket-template" xlink:href="#rocket-template" class="rocket" style="--rocket-accent:#2f6df0" transform="translate(663,563) rotate(315)" />
-      <use href="#rocket-template" xlink:href="#rocket-template" class="rocket" style="--rocket-accent:#2fb8a6" transform="translate(500,630) rotate(0)" />
-      <use href="#rocket-template" xlink:href="#rocket-template" class="rocket" style="--rocket-accent:#8a5cf6" transform="translate(337,563) rotate(45)" />
-      <use href="#rocket-template" xlink:href="#rocket-template" class="rocket" style="--rocket-accent:#ef5da8" transform="translate(337,237) rotate(135)" />
-    </svg>
+  <div class="hero__photo" aria-hidden="true">
+    <picture class="hero__photo-frame">
+      <source srcset="assets/hero.webp" type="image/webp" />
+      <img
+        class="hero__photo-img"
+        src="assets/hero.jpeg"
+        alt=""
+        loading="eager"
+        fetchpriority="high"
+        width="1408"
+        height="768"
+        onerror="this.closest('.hero__photo').classList.add('hero__photo--error')"
+      />
+    </picture>
   </div>
 
   <div class="hero__scrim" aria-hidden="true"></div>
@@ -419,7 +333,6 @@
 </section>
 
 <script src="js/utils.js"></script>
-<script src="js/hero-scene.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/video.js"></script>
 <script src="js/main.js"></script>

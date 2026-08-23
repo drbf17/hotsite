@@ -22,7 +22,6 @@ Hotsite.setupInView = function (selector) {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  if (Hotsite.heroScene) Hotsite.heroScene.init();
   if (Hotsite.scenario) Hotsite.scenario.init();
   if (Hotsite.practices) Hotsite.practices.init();
 
