@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "SecurityVerdict",
+  "spec_id": "hero-lateral-travelling-photos",
+  "content_hash": "sha256:f5fccf3038bf010524b1a18276c01ab68fd3d3fc9fdc2a3b21d3d732171d33e4",
+  "parent_hash": "sha256:a620ca8ae4d9f3a4a0522de14a821d4adc2abc7fc0c66ddb41167d621271facb",
+  "produced_by": {
+    "agent": "verifier (Stage 4 — security)",
+    "repo": "drbf17/hotsite",
+    "run_id": "verifier-2026-08-23T02:31:00Z",
+    "model_version": "claude-opus-5"
+  },
+  "produced_at": "2026-08-23T02:31:00Z",
+  "payload": {
+    "status": "WARN",
+    "findings": [
+      {
+        "severity": "LOW",
+        "rule": "semgrep:javascript.playwright.security.audit.playwright-goto-injection (CWE-918, OWASP A10:2021; semgrep severity WARNING, confidence LOW, impact LOW, likelihood LOW, subcategory=audit)",
+        "file": "scripts/verify-hero-pan.cjs",
+        "line": 43,
+        "note": "`url` is built from path.resolve(__dirname,'..') plus a slug from the hardcoded PRESENTATIONS const array and pathToFileURL(); no user-controlled data reaches page.goto. Not exploitable. Recorded because the finding is real tool output that the configured `sast` check never sees (its scope is `js/ presentations/`, excluding `scripts/`).",
+        "expiresAt": "2026-11-21"
+      },
+      {
+        "severity": "LOW",
+        "rule": "semgrep:javascript.playwright.security.audit.playwright-goto-injection (CWE-918)",
+        "file": "scripts/verify-hero-pan.cjs",
+        "line": 84,
+        "expiresAt": "2026-11-21"
+      },
+      {
+        "severity": "LOW",
+        "rule": "semgrep:javascript.playwright.security.audit.playwright-goto-injection (CWE-918)",
+        "file": "scripts/verify-hero-pan.cjs",
+        "line": 99,
+        "expiresAt": "2026-11-21"
+      },
+      {
+        "severity": "MEDIUM",
+        "rule": "scan-scope-gap: new executable code merged outside every configured static/SAST glob",
+        "file": "agentic.config.yaml",
+        "line": 91,
+        "note": "`sast` runs `semgrep --config auto --error --quiet js/ presentations/`; `lint-js` and `static-structure` glob `js/**/*.js` and `presentations/**/*.js`. None match `scripts/**/*.cjs`. scripts/verify-hero-pan.cjs (149 LOC, new in this commit) therefore entered the repo with zero SAST and zero static-structure gating. Verifier re-ran semgrep against scripts/ directly and it exits 1 with 3 findings, proving the gap is not theoretical. Required fix: extend the sast/lint-js/static-structure scopes to cover scripts/ (and *.cjs), then re-run.",
+        "expiresAt": "2026-09-22"
+      },
+      {
+        "severity": "LOW",
+        "rule": "hardening: inline event handler introduced into a repo with no Content-Security-Policy",
+        "file": "presentations/mudanca-para-negocio/index.html",
+        "line": 35,
+        "note": "onerror=\"this.closest('.hero__photo').classList.add('hero__photo--error')\" — verified by reading the markup: a static literal attribute, no template interpolation, no user-controlled value in the expression, both the selector and the class name are hardcoded. NOT an XSS sink. It is however the only inline handler in the repo and there is no CSP anywhere; adopting a strict script-src later will require a hash/nonce or moving this to an addEventListener in main.js. Same finding at presentations/template-driven-ui/index.html:39.",
+        "expiresAt": "2026-11-21"
+      }
+    ],
+    "dependencyDecisions": [
+      {
+        "pkg": "playwright@1.62.1 (globally installed, dev-only prerequisite of the e2e-hero-pan check)",
+        "decision": "APPROVED",
+        "reason": "License Apache-2.0 (verified from the resolved package.json of the global install). Not a runtime dependency: no package.json or lockfile is added, the package is never served, and it is absent from the deploy path. Caveat recorded, not blocking: the version is not pinned by any manifest in this repo, so the e2e gate's reproducibility depends on whichever global playwright happens to be installed on the runner. No KEV-listed CVE applies — this changeset adds zero runtime dependencies."
+      }
+    ],
+    "evidence": {
+      "sast_rerun_by_verifier": "semgrep --config auto --error --quiet js/ presentations/ -> exit 0 (independently re-run, not taken from the VerificationLog)",
+      "sast_extended_scope": "semgrep --config auto --error --quiet scripts/ -> exit 1, 3 WARNING/LOW findings (see findings above)",
+      "secrets_scan": "git show 7f17c2a --unified=0 (binaries excluded) grepped for api_key|secret|token|password|bearer|authorization|aws_|private_key|BEGIN *PRIVATE -> 0 true positives; the only matches were the substring 'token' inside 'tokens.css' in Portuguese spec prose.",
+      "owasp_applicability": "Sealed spec data_touched claims no PII / no user input. Verified independently rather than trusted: the diff adds no <form>, <input>, <textarea>, fetch(), XMLHttpRequest, localStorage, sessionStorage, document.cookie, eval(), new Function(), or innerHTML assignment anywhere. The classification holds; OWASP Top 10 user-input surface is genuinely nil for this changeset.",
+      "new_runtime_dependencies": "0. No package.json touched. Added artifacts are two static images per bundle plus CSS/HTML.",
+      "kev_check": "Not applicable — zero runtime dependencies in this static, build-free site."
+    },
+    "blocking_summary": "0 CRITICAL, 0 HIGH, 0 hardcoded secrets, 0 KEV-listed CVEs. Nothing here is overridable-class. Status WARN (1 MEDIUM + 4 LOW, all with tracked expiry, forward-fix permitted). Merge is not blocked on security."
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "QaVerdict",
+  "spec_id": "hero-lateral-travelling-photos",
+  "content_hash": "sha256:bb36bd159dadadc7b112023fea07281bc6ed3d4b8cf27ad11f07dffa0c29a542",
+  "parent_hash": "sha256:a620ca8ae4d9f3a4a0522de14a821d4adc2abc7fc0c66ddb41167d621271facb",
+  "produced_by": {
+    "agent": "verifier (Stage 6 — QA)",
+    "repo": "drbf17/hotsite",
+    "run_id": "verifier-2026-08-23T02:31:00Z",
+    "model_version": "claude-opus-5"
+  },
+  "produced_at": "2026-08-23T02:31:00Z",
+  "payload": {
+    "status": "FAIL",
+    "pinnedSpecHash": "sha256:a620ca8ae4d9f3a4a0522de14a821d4adc2abc7fc0c66ddb41167d621271facb",
+    "coverageReport": {
+      "businessLogic": null,
+      "ui": null,
+      "branch": null,
+      "measurable": false,
+      "justification": "No coverage instrumentation exists in this repo and CLAUDE.md forbids introducing one (static, build-free, no package.json/lockfile by design). Reporting 0% would be false and reporting a number would be fabricated, so these are null. This is NOT the reason for the FAIL — see criteriaTraceability. The substantive QA substrate here is scripts/verify-hero-pan.cjs, a real Playwright script driving actual Chromium instances against both pages and asserting on computed styles and DOM state; the verifier executed it independently, 26 assertions, all PASS."
+    },
+    "mutationReport": [
+      {
+        "tier": "all",
+        "score": null,
+        "floor": null,
+        "note": "Not measurable: no mutation tool, and introducing one requires a package.json that CLAUDE.md prohibits. No mutationScope tags were emitted by the build agent for this changeset, so there is nothing to audit for markup-only mistagging. Recorded as unavailable, not as a passing or failing score."
+      }
+    ],
+    "crapScore": [
+      {
+        "file": "scripts/verify-hero-pan.cjs",
+        "score": null,
+        "note": "CRAP = complexity x coverage requires a coverage axis that does not exist here. The complexity axis was measured (max 4; checkPresentation = 3) and is far below the point where CRAP becomes informative even at low coverage."
+      }
+    ],
+    "criteriaTraceability": {
+      "AC1_renders_without_errors_hero_above_the_fold": {
+        "automated_tests": [
+          "e2e-hero-pan:A/page.goto(url) completing without throwing, for both slugs (weak/implicit)"
+        ],
+        "coverage": "PARTIAL",
+        "gap": "No page.on('pageerror') or console-error listener, so 'renderiza sem erros' is not actually asserted — a JS exception on load would not fail the gate. No assertion that #hero is the first visible element or that it occupies the fold (no boundingBox / viewport-intersection check)."
+      },
+      "AC2_mudanca_photo_fills_hero_pingpong_pure_css_no_svg_no_starfield": {
+        "automated_tests": [
+          "e2e:.hero__scene removed (count===0)",
+          "e2e:.hero__starfield removed (count===0)",
+          "e2e:<picture> has a webp <source> (count===1)",
+          "e2e:fallback <img> src ends with .jpeg",
+          "e2e:object-fit === 'cover'",
+          "e2e:animationName === 'hero-pan'",
+          "e2e:animationDuration === '20s'",
+          "e2e:animationIterationCount === 'infinite'",
+          "e2e:animationDirection === 'alternate'"
+        ],
+        "coverage": "COVERED",
+        "gap": "Block A never asserts the image actually decoded (no naturalWidth > 0 / complete check) and never asserts which source the browser picked. Every assertion in block A would still pass with both assets 404ing, because animation and object-fit are computed styles on elements that exist regardless. Recommend adding an img.naturalWidth > 0 assertion and asserting currentSrc ends with .webp."
+      },
+      "AC3_template_driven_ui_same": {
+        "automated_tests": [
+          "same 9 assertions, executed for slug template-driven-ui"
+        ],
+        "coverage": "COVERED",
+        "gap": "Same decode gap as AC2."
+      },
+      "AC4_prefers_reduced_motion_static_centered_no_js": {
+        "automated_tests": [
+          "e2e:B/browser.newContext({reducedMotion:'reduce'}) then computed animationName === 'none', both slugs"
+        ],
+        "coverage": "PARTIAL",
+        "gap": "The 'sem nenhuma animação de translação' half is asserted. The 'estática, CENTRALIZADA' half is not: nothing checks the computed left:50% / transform:translateX(-50%) that hero.css applies inside the reduced-motion media query. The 'sem JS' half is asserted only structurally (hero-scene.js deleted, main.js no longer calls it) — the script itself makes no JS-absence assertion, so agentic.config.yaml's note claiming the check proves 'with zero JS involved' overstates what it measures."
+      },
+      "AC5_scrim_preserved_text_contrast": {
+        "automated_tests": [],
+        "coverage": "NONE",
+        "gap": "BLOCKING GAP. Zero assertions in scripts/verify-hero-pan.cjs reference .hero__scrim, or the hero text elements, or any contrast/opacity value — verified by reading the whole 149-line script. .hero__scrim is in fact preserved in both hero.css files (verifier read presentations/mudanca-para-negocio/css/hero.css:63-70: position:absolute; inset:auto 0 0 0; height:48%; z-index:2; linear-gradient to var(--scene-space-deep) 82%), and the one-time manual Chromium visual pass the build agent ran covers it — but that pass produced screenshots, not a repeatable check, so nothing prevents a future edit from deleting or weakening the scrim silently. Required: assert .hero__scrim exists, has z-index above .hero__photo, and has a non-transparent computed background-image/gradient."
+      },
+      "AC6_object_fit_cover_no_bars_any_breakpoint_incl_ultrawide_and_640px": {
+        "automated_tests": [
+          "e2e:object-fit === 'cover' on .hero__photo-img, both slugs"
+        ],
+        "coverage": "PARTIAL",
+        "gap": "Asserted at Playwright's default 1280x720 viewport only. The AC explicitly names ultrawide (~1.83:1 and wider) and <=640px, and explicitly says 'durante todo o ciclo do ping-pong'. No viewport is resized and no geometry is measured at either end of the animation. The verifier checked the math by hand and it holds — .hero__photo-frame is width:140% translating to -25% (= -35% of the hero width), so at the end keyframe the frame spans -35%..105%, still fully covering 0..100% with 5% margin; under reduced motion left:50% + translateX(-50%) spans -20%..120% — but that is verifier reasoning, not an automated check. Required: parameterise the check over at least 3 viewports (e.g. 2560x1080, 1280x720, 375x667) and assert the frame's boundingBox covers the hero's boundingBox at animationDelay 0s and at -20s."
+      },
+      "AC7_no_layout_shift_cls_zero": {
+        "automated_tests": [],
+        "coverage": "NONE",
+        "gap": "BLOCKING GAP. No CLS measurement anywhere — no PerformanceObserver('layout-shift'), no before/after geometry comparison. The implementation looks correct by construction (the <img> carries width=\"1408\" height=\"768\", .hero reserves min-height:100vh, and .hero__photo is position:absolute inset:0 so the photo is out of flow entirely) and the corresponding NFR is 'CLS = 0', but correctness-by-construction is an argument, not a check. Required: add a layout-shift PerformanceObserver assertion collecting cumulative value === 0 after load."
+      },
+      "AC8_image_load_failure_solid_blue900_no_svg_restored": {
+        "automated_tests": [
+          "e2e:C/page.route('**/assets/hero.{jpeg,webp}') -> route.abort(), then hero__photo--error class present",
+          "e2e:computed backgroundColor === 'rgb(10, 26, 60)'",
+          "e2e:.hero__scene count === 0 on error"
+        ],
+        "coverage": "COVERED",
+        "gap": "The AC also requires 'mantendo .hero__scrim e todo o texto legível' in the error state — not asserted (same omission as AC5)."
+      }
+    },
+    "criteriaTraceabilitySummary": {
+      "acs_total": 8,
+      "acs_with_at_least_one_automated_assertion": 6,
+      "acs_with_zero_automated_assertion": [
+        "AC5 (scrim/contrast preserved)",
+        "AC7 (no layout shift / CLS 0)"
+      ],
+      "mapping_percent": 75.0,
+      "required_percent": 100.0,
+      "verdict_driver": "This is the FAIL. The gate requires 100% of acceptance criteria mapped to at least one test; measured 6/8 = 75%. Two sealed ACs have no automated backing at all and rest solely on a one-time, non-persisted manual Playwright/Chromium visual pass."
+    },
+    "antiTautologyAudit": {
+      "method": "Each assertion was read out of scripts/verify-hero-pan.cjs and traced back to a specific line of the sealed spec, to distinguish spec-derived assertions from assertions that merely echo whatever the implementation happens to do.",
+      "spot_checks": [
+        {
+          "assertion": "animationDirection === 'alternate' (verify-hero-pan.cjs:75)",
+          "spec_source": "acceptance_criteria AC2/AC3 'se desloca lateralmente em vai-e-volta contínuo (ping-pong)' + Notes item 3 'Mecanismo do pan: ping-pong (não loop com wraparound sem costura)'",
+          "verdict": "SPEC-DERIVED. The PO explicitly chose ping-pong over a wraparound loop; 'alternate' is the direct CSS encoding of that choice, and the assertion would fail if the implementation drifted to 'normal'."
+        },
+        {
+          "assertion": "animationDuration === '20s' (verify-hero-pan.cjs:73)",
+          "spec_source": "nfrs[0] 'duração de um ciclo do pan lateral (ping-pong, ida)' = '20s por trecho (40s ida+volta) — confirmado pelo PO'",
+          "verdict": "SPEC-DERIVED. A quantified NFR with a PO-confirmed number, not a value read back off the implementation."
+        },
+        {
+          "assertion": "backgroundColor === 'rgb(10, 26, 60)' (verify-hero-pan.cjs:26,122)",
+          "spec_source": "AC8 'o hero exibe um fundo sólido usando o token --color-blue-900 (#0a1a3c)'",
+          "verdict": "SPEC-DERIVED — #0a1a3c is exactly rgb(10,26,60). See flakiness FLK-2 for the brittleness of hardcoding the resolved value rather than reading the token."
+        },
+        {
+          "assertion": "objectFit === 'cover' (verify-hero-pan.cjs:61)",
+          "spec_source": "AC6 'a foto usa object-fit: cover' + Notes item 6 'Ultra-wide: object-fit: cover'",
+          "verdict": "SPEC-DERIVED, verbatim from the AC."
+        },
+        {
+          "assertion": ".hero__scene and .hero__starfield count === 0 (verify-hero-pan.cjs:45-49)",
+          "spec_source": "AC2/AC3 'sem SVG de estação/foguetes e sem starfield de estrelas' + out_of_scope 'Manter o starfield de estrelas geradas por JS como camada extra — foi decidido remover, não sobrepor'",
+          "verdict": "SPEC-DERIVED. Encodes a negative requirement the PO stated explicitly."
+        }
+      ],
+      "conclusion": "No tautological assertions found. All 13 assertions per presentation trace to a sealed AC, NFR, or out_of_scope line. The weakness in this suite is not tautology — it is incompleteness (AC5 and AC7 unasserted) plus the fact that block A would pass with broken images."
+    },
+    "nfrVerification": [
+      {
+        "nfr": "pan 20s por trecho",
+        "status": "VERIFIED_AUTOMATED",
+        "evidence": "e2e asserts animationDuration === '20s' for both slugs"
+      },
+      {
+        "nfr": "<=400KB por imagem",
+        "status": "VERIFIED_BY_VERIFIER_ONLY",
+        "evidence": "stat: mudanca hero.jpeg 267KB, hero.webp 205KB; template-driven-ui hero.jpeg 263KB, hero.webp 178KB. All within budget. No repeatable check enforces this — a future re-export could silently blow the budget."
+      },
+      {
+        "nfr": "CLS = 0",
+        "status": "UNVERIFIED",
+        "evidence": "See AC7. No measurement performed by anyone."
+      },
+      {
+        "nfr": "prefers-reduced-motion: 0 transform animations, CSS-only",
+        "status": "VERIFIED_AUTOMATED_PARTIAL",
+        "evidence": "animationName === 'none' asserted; centering and JS-absence not asserted"
+      },
+      {
+        "nfr": "LCP <= 2.5s em rede 4G simulada / mobile de gama média",
+        "status": "UNVERIFIED",
+        "evidence": "No LCP measurement exists anywhere — not in the e2e script, not in the VerificationLog, and no throttled-network run was performed. The WebP conversion that the spec puts in scope specifically to hit this target was done (205KB/178KB webp alongside 267KB/263KB jpeg) and the <img> carries loading=\"eager\" fetchpriority=\"high\", which are the right levers, but the NFR's number was never measured. Note also that the spec's Notes describe '<picture> com fontes AVIF/WebP'; only WebP was shipped, no AVIF <source>. The binding NFR text says 'WebP/AVIF', so WebP-only satisfies it — recorded as a divergence from the Notes, not from an AC."
+      }
+    ],
+    "flakinessLog": [
+      {
+        "testId": "e2e-hero-pan (whole suite, 26 assertions)",
+        "window": 20,
+        "failures": 0,
+        "quarantined": false,
+        "note": "5/5 deterministic on introduction — the verifier executed the suite 5 consecutive times against a clean `git archive 7f17c2a` extraction, all exit 0, plus a 6th verbose run showing 26/26 PASS. The 20-run rolling window cannot be completed in this session; 0 flaky observed so far."
+      },
+      {
+        "testId": "FLK-1: e2e-hero-pan block C, image-error fallback",
+        "window": 20,
+        "failures": 0,
+        "quarantined": false,
+        "note": "REAL FLAKINESS RISK, not yet observed. verify-hero-pan.cjs:113 uses setTimeout(resolve, 3000) as the escape hatch on a MutationObserver wait. This is a fixed unbounded-wait, not a Playwright auto-retrying assertion: if the image error event has not propagated within 3s under CPU contention or a cold Chromium start, the promise resolves anyway and the very next line asserts hasErrorClass, producing a confusing FAIL. Local headroom is currently large (~2s for the whole suite), which is exactly why this will surface first on a loaded CI box rather than here. Additionally line 116's .catch(() => {}) silently swallows any evaluate() error. Fix: replace with await expect(photo).toHaveClass(/hero__photo--error/) or a page.waitForFunction with an explicit, generous timeout that fails loudly on expiry."
+      },
+      {
+        "testId": "FLK-2: hardcoded token/duration string coupling",
+        "window": 20,
+        "failures": 0,
+        "quarantined": false,
+        "note": "REAL BRITTLENESS RISK. EXPECTED_ERROR_BG = 'rgb(10, 26, 60)' (verify-hero-pan.cjs:26) hardcodes the resolved value of --color-blue-900, and line 73 hardcodes '20s'. Neither is read from tokens.css or hero.css. An unrelated design-token retune, or a PO decision to change the pan duration, breaks a blocking gate with a failure message that points at the hero feature rather than at the token change that caused it. Fix: resolve the expected colour at runtime via getComputedStyle(document.documentElement).getPropertyValue('--color-blue-900') and normalise, so the check tracks the token instead of shadowing it."
+      },
+      {
+        "testId": "FLK-3: unpinned global playwright",
+        "window": 20,
+        "failures": 0,
+        "quarantined": false,
+        "note": "REAL REPRODUCIBILITY RISK. The gate depends on `npm install -g playwright` (resolved here to 1.62.1, Apache-2.0) with no version pinned in any file in the repo. Block C also depends on Playwright's page.route intercepting file:// requests, which is undocumented-adjacent behaviour; the verifier confirmed it works on 1.62.1, but a future major could change it and turn AC8's only automated coverage into a silent false pass or an opaque failure. Fix: record the tested playwright version in agentic.config.yaml's e2e-hero-pan note and assert it at script start."
+      }
+    ],
+    "contractViolations": [
+      "GATE REPRODUCIBILITY — 4 of the 7 blocking tier-1 checks declared by the agentic.config.yaml committed IN THIS CHANGESET do not reproduce from a clean checkout of 7f17c2a. The verifier extracted the commit with `git archive 7f17c2a | tar -x` into a clean directory and re-ran every check from agentic.config.yaml there. Measured: lint-html exit 0 (PASS), e2e-hero-pan exit 0 (PASS, 26/26 assertions), sast exit 0 (PASS) — but lint-js exit 2, lint-css exit 78 (ConfigurationError: No configuration provided), typecheck exit 1, static-structure exit 2. Root cause: eslint.config.mjs, eslint.static.config.mjs, .stylelintrc.json, jsconfig.json and global.d.ts are UNTRACKED working-tree files (confirmed via `git cat-file -e 7f17c2a:<path>` failing for each), while agentic.config.yaml, which depends on all of them, WAS committed and pushed to origin/main. The VerificationLog's 7/7 green is therefore an artifact of the dirty local working tree, not a property of the merge candidate. REQUIRED FIX: commit the five tooling config files, then re-run the Stage 3 tier-1 checks against the resulting commit.",
+      "CHECK DECLARATION vs BEHAVIOUR (minor) — agentic.config.yaml e2e-hero-pan: command and pass_when are accurate (verified by execution; the script calls process.exit(0) on success and process.exit(1) with a failure count otherwise), and enforcement: blocking is appropriate. Two inaccuracies in the declaration: (a) `scope` lists only presentations/mudanca-para-negocio/** and presentations/template-driven-ui/**, omitting scripts/verify-hero-pan.cjs itself, so a change to the checker does not trigger the checker; (b) the `note` claims the check confirms prefers-reduced-motion 'with zero JS involved' — the script asserts animationName === 'none' and makes no JS-absence assertion. Tighten the note to match what is measured.",
+      "COMMIT MESSAGE OVERCLAIM (informational) — 'no JS is involved' is true of the pan and of the reduced-motion handling, but the AC8 error fallback is implemented with an inline JavaScript onerror handler (index.html:35 / :39). Not a spec divergence — AC2/AC3 scope the 'sem JS' constraint to the pan — but the blanket phrasing is inaccurate."
+    ],
+    "mutationScopeAudit": {
+      "performed": false,
+      "reason": "No mutationScope tags were emitted for this changeset (no mutation tooling exists in this repo), so there are no self-assigned markup-only tags to sample or re-tag. Recorded explicitly rather than silently skipped."
+    },
+    "orthogonalityNote": "Pass 2 and Pass 3 were judged independently and neither was allowed to stand in for the other. The Watchdog PASS rests on measured code-shape metrics; it says nothing about whether the right behaviour is asserted. This QA FAIL rests on AC-to-test mapping; it says nothing about code shape. The e2e suite being 26/26 green is evidence that the assertions that exist hold — not evidence that the assertions that should exist do.",
+    "requiredFixes": [
+      "QA-1 (blocking, AC5): add assertions to scripts/verify-hero-pan.cjs that .hero__scrim exists in both the normal and the image-error states, sits above .hero__photo in stacking order, and retains a non-transparent gradient background. Currently zero assertions reference it.",
+      "QA-2 (blocking, AC7): add a layout-shift PerformanceObserver assertion (cumulative value === 0 after load) for both slugs, covering the CLS = 0 NFR.",
+      "QA-3 (AC6): parameterise the object-fit/cover check across at least an ultrawide (e.g. 2560x1080), a default, and a <=640px viewport, and assert the .hero__photo-frame boundingBox covers the .hero boundingBox at both ends of the animation, rather than only asserting the object-fit property at one viewport.",
+      "QA-4 (AC2/AC3): assert the hero image actually decoded (img.naturalWidth > 0) and that currentSrc resolves to the .webp, so block A cannot pass with 404ing assets.",
+      "QA-5 (AC1): attach a page.on('pageerror') listener and fail on any uncaught exception, so 'renderiza sem erros' is genuinely asserted.",
+      "QA-6 (AC4): assert the reduced-motion centering (computed left / transform), not only animationName === 'none'.",
+      "QA-7 (FLK-1): replace the setTimeout(resolve, 3000) race at verify-hero-pan.cjs:113 with an auto-retrying assertion or an explicitly-failing waitForFunction, and remove the .catch(() => {}) that swallows evaluate errors at line 116.",
+      "QA-8 (FLK-2): read --color-blue-900 from computed styles instead of hardcoding 'rgb(10, 26, 60)', so an unrelated token change cannot break a blocking gate with a misleading message.",
+      "QA-9 (NFR): the LCP <= 2.5s NFR was never measured by anyone. Either add a throttled-network LCP measurement or record an explicit, human-granted acceptance that this NFR ships unverified. The verifier does not grant waivers."
+    ],
+    "verdictSummary": "FAIL. Not because coverage/mutation percentages are unavailable — those are correctly reported as unmeasurable given this repo's deliberate no-tooling constraint, and the e2e substrate that does exist is genuine (real Chromium, 26 assertions, all spec-derived, 5/5 deterministic, reproducible from a clean checkout). FAIL is driven by the one QA gate that IS measurable here: AC-to-test mapping is 6/8 = 75% against a required 100%, with AC5 (scrim/contrast preserved) and AC7 (CLS = 0) having zero automated backing and resting only on a one-time manual visual pass that was not persisted as a repeatable check. Secondary: the committed gate config does not reproduce (see contractViolations)."
+  }
+}

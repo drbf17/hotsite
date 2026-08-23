@@ -1,6 +1,6 @@
 export default [
   {
-    files: ["js/**/*.js", "presentations/**/*.js"],
+    files: ["js/**/*.js", "presentations/**/*.js", "scripts/**/*.cjs"],
     languageOptions: { ecmaVersion: "latest", sourceType: "script" },
     rules: {
       complexity: ["error", 15],

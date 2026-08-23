@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "VerificationLog",
+  "spec_id": "hero-lateral-travelling-photos",
+  "content_hash": "sha256:b7bba81f7d2320a0ac5898a802a339b5254eb24c85bd0eb7e83579611b066ea2",
+  "parent_hash": "sha256:a620ca8ae4d9f3a4a0522de14a821d4adc2abc7fc0c66ddb41167d621271facb",
+  "produced_by": {
+    "agent": "verify-gate (orchestrator, re-running Stage 3 tier-1 checks before gates)",
+    "repo": "drbf17/hotsite",
+    "run_id": "verify-gate-2026-08-23T02:03:33Z",
+    "model_version": "claude-sonnet-5"
+  },
+  "produced_at": "2026-08-23T02:03:33Z",
+  "payload": {
+    "spec_id": "hero-lateral-travelling-photos",
+    "config_hash": "sha256:d6bbdaebeaf552e4871a078ebe52b0d111ed9d3d9caec07d080de4276dd89a95",
+    "runs": [
+      {
+        "check_id": "lint-html",
+        "category": "lint",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 1,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "lint-js",
+        "category": "lint",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 1,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "lint-css",
+        "category": "lint",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 1,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "typecheck",
+        "category": "typecheck",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 1,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "static-structure",
+        "category": "static",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 0,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "sast",
+        "category": "sast",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 5,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      },
+      {
+        "check_id": "e2e-hero-pan",
+        "category": "e2e",
+        "stage": "gate",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "duration_seconds": 2,
+        "attempt": 1,
+        "at": "2026-08-23T02:03:33Z"
+      }
+    ],
+    "waivers_active": [],
+    "notes": "Re-run of all 7 blocking checks defined in agentic.config.yaml against committed HEAD (7f17c2a, pushed to origin/main). All exit 0. 0 of 7 blocking tier-1 checks failing, satisfying the Stage 3 gate precondition (threshold: 0). Scope limited to the hero-lateral-travelling-photos changeset; three unrelated pre-existing working-tree modifications (js/selection.js, presentations/mudanca-para-negocio/js/video.js, presentations/template-driven-ui/js/practices.js) were present on disk during this run but are out of scope for this spec and were not part of the reviewed diff."
+  }
+}

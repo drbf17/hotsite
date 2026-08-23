@@ -1,16 +1,25 @@
 schema_version: "1.0"
 artifact_type: RepoVerificationConfig
-content_hash: "sha256:d6bbdaebeaf552e4871a078ebe52b0d111ed9d3d9caec07d080de4276dd89a95"
+content_hash: "sha256:430ec0d8706540ec73793bf387fc6e2726decb7032526f8e89b658995f0957a3"
 produced_by:
   agent: "config-agent"
   repo: "drbf17/hotsite"
   run_id: "bootstrap-2026-08-22"
   model_version: "claude-sonnet-5"
 produced_at: "2026-08-22T22:25:56Z"
-amended_at: "2026-08-22T23:10:00Z"
-amended_by:
-  agent: "frontend-dev (build phase, hero-lateral-travelling-photos)"
-  reason: "added e2e-hero-pan check to validate the sealed spec's acceptance criteria in a real browser"
+amendments:
+  - amended_at: "2026-08-22T23:10:00Z"
+    amended_by: "frontend-dev (build phase, hero-lateral-travelling-photos)"
+    reason: "added e2e-hero-pan check to validate the sealed spec's acceptance criteria in a real browser"
+  - amended_at: "2026-08-22T23:20:00Z"
+    amended_by: "verify-gate fix-up (hero-lateral-travelling-photos)"
+    reason: >
+      Security pass (verifier agent) found lint-js/static-structure/sast all
+      scoped to js/ and presentations/ only, so scripts/verify-hero-pan.cjs
+      (149 LOC, new) shipped completely ungated by any check. Widened all
+      three commands to include scripts/**/*.cjs (or scripts/ for semgrep),
+      and added a matching scripts/**/*.cjs block to eslint.config.mjs /
+      eslint.static.config.mjs.
 approved_by: "drbf17@gmail.com"
 
 payload:
@@ -38,12 +47,12 @@ payload:
 
     - id: lint-js
       category: lint
-      command: "npx --yes eslint \"js/**/*.js\" \"presentations/**/*.js\""
+      command: "npx --yes eslint \"js/**/*.js\" \"presentations/**/*.js\" \"scripts/**/*.cjs\""
       pass_when: "exit_code == 0"
       enforcement: blocking
       scope: whole-repo
       runs_in: [dev-loop, pre-push, gate]
-      verified_at: "2026-08-22T22:20:00Z"
+      verified_at: "2026-08-22T23:20:00Z"
       typical_duration_seconds: 1
 
     - id: lint-css
@@ -74,12 +83,12 @@ payload:
 
     - id: static-structure
       category: static
-      command: "npx --yes eslint --config eslint.static.config.mjs \"js/**/*.js\" \"presentations/**/*.js\""
+      command: "npx --yes eslint --config eslint.static.config.mjs \"js/**/*.js\" \"presentations/**/*.js\" \"scripts/**/*.cjs\""
       pass_when: "exit_code == 0"
       enforcement: blocking
       scope: whole-repo
       runs_in: [dev-loop, pre-push, gate]
-      verified_at: "2026-08-22T22:20:00Z"
+      verified_at: "2026-08-22T23:20:00Z"
       typical_duration_seconds: 1
       note: >
         Structural/complexity rules (complexity, max-depth, max-params,
@@ -88,12 +97,12 @@ payload:
 
     - id: sast
       category: sast
-      command: "semgrep --config auto --error --quiet js/ presentations/"
+      command: "semgrep --config auto --error --quiet js/ presentations/ scripts/"
       pass_when: "exit_code == 0"
       enforcement: blocking
       scope: whole-repo
       runs_in: [pre-push, gate]
-      verified_at: "2026-08-22T22:25:00Z"
+      verified_at: "2026-08-22T23:20:00Z"
       typical_duration_seconds: 7
       note: >
         Installed via `brew install semgrep` (pip blocked by Homebrew's

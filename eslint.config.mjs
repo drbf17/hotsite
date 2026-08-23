@@ -38,4 +38,34 @@ export default [
       eqeqeq: "warn",
     },
   },
+  {
+    files: ["scripts/**/*.cjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "script",
+      globals: {
+        require: "readonly",
+        module: "writable",
+        process: "readonly",
+        __dirname: "readonly",
+        console: "readonly",
+        // DOM globals referenced inside page.evaluate() callback bodies —
+        // lint-parsed as ordinary code even though they run in a separate
+        // browser context at test time, not in this Node process.
+        window: "readonly",
+        document: "readonly",
+        getComputedStyle: "readonly",
+      },
+    },
+    rules: {
+      "no-undef": "error",
+      "no-unused-vars": "warn",
+      "no-redeclare": "error",
+      "no-dupe-keys": "error",
+      "no-dupe-args": "error",
+      "no-const-assign": "error",
+      "no-unreachable": "error",
+      eqeqeq: "warn",
+    },
+  },
 ];

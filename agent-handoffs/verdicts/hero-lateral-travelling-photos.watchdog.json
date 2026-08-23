@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "ReviewVerdict",
+  "spec_id": "hero-lateral-travelling-photos",
+  "content_hash": "sha256:c38ff52ef6c7f577b1ab917abc027d01217e6023f3f5db71ada61e2258c5574e",
+  "parent_hash": "sha256:a620ca8ae4d9f3a4a0522de14a821d4adc2abc7fc0c66ddb41167d621271facb",
+  "produced_by": {
+    "agent": "verifier (Stage 5 — architecture watchdog)",
+    "repo": "drbf17/hotsite",
+    "run_id": "verifier-2026-08-23T02:31:00Z",
+    "model_version": "claude-opus-5"
+  },
+  "produced_at": "2026-08-23T02:31:00Z",
+  "payload": {
+    "status": "PASS",
+    "attemptNumber": 1,
+    "violatedRules": [],
+    "measurements": {
+      "tool": "npx eslint (core rules: complexity, max-depth, max-params, max-nested-callbacks) run by the verifier with thresholds deliberately set to 1 so every function reports its true measured value; wc -l for file LOC.",
+      "max_cyclomatic_complexity": {
+        "value": 4,
+        "where": "scripts/verify-hero-pan.cjs:29 (the `record` arrow)",
+        "soft": 10,
+        "hard": 15,
+        "status": "PASS"
+      },
+      "checkPresentation_complexity": {
+        "value": 3,
+        "where": "scripts/verify-hero-pan.cjs:35",
+        "soft": 10,
+        "hard": 15,
+        "status": "PASS",
+        "note": "Spot-checked explicitly as requested: this is the largest function added by the changeset (95 lines, 3 lexical blocks A/B/C). Cyclomatic 3, params 2, nesting depth 2 — comfortably inside every threshold."
+      },
+      "presentation_js_max_complexity": {
+        "value": 3,
+        "where": "presentations/*/js/main.js",
+        "soft": 10,
+        "hard": 15,
+        "status": "PASS"
+      },
+      "max_params": {
+        "value": 3,
+        "where": "scripts/verify-hero-pan.cjs:29",
+        "threshold": 4,
+        "status": "PASS"
+      },
+      "max_nesting_depth": {
+        "value": 2,
+        "where": "scripts/verify-hero-pan.cjs:134",
+        "threshold": 4,
+        "status": "PASS"
+      },
+      "max_nested_callbacks": {
+        "value": 2,
+        "where": "presentations/template-driven-ui/js/main.js:28",
+        "threshold": 4,
+        "status": "PASS"
+      },
+      "file_loc_logic": [
+        {
+          "file": "presentations/mudanca-para-negocio/css/hero.css",
+          "loc": 140,
+          "soft": 400,
+          "hard": 600,
+          "status": "PASS",
+          "delta": "was 201 before this commit; net -61"
+        },
+        {
+          "file": "presentations/template-driven-ui/css/hero.css",
+          "loc": 138,
+          "soft": 400,
+          "hard": 600,
+          "status": "PASS"
+        },
+        {
+          "file": "presentations/mudanca-para-negocio/js/main.js",
+          "loc": 28,
+          "soft": 400,
+          "hard": 600,
+          "status": "PASS"
+        },
+        {
+          "file": "presentations/template-driven-ui/js/main.js",
+          "loc": 31,
+          "soft": 400,
+          "hard": 600,
+          "status": "PASS"
+        },
+        {
+          "file": "scripts/verify-hero-pan.cjs",
+          "loc": 149,
+          "soft": 400,
+          "hard": 600,
+          "status": "PASS"
+        }
+      ],
+      "file_loc_markup": [
+        {
+          "file": "presentations/mudanca-para-negocio/index.html",
+          "loc": 340,
+          "soft": 550,
+          "hard": 800,
+          "status": "PASS",
+          "delta": "-86 lines; the inline SVG scene was removed"
+        },
+        {
+          "file": "presentations/template-driven-ui/index.html",
+          "loc": 442,
+          "soft": 550,
+          "hard": 800,
+          "status": "PASS",
+          "delta": "-39 lines"
+        }
+      ],
+      "threshold_hugging": "None. No file or function in this changeset lands within 5% of any hard-fail line. The closest logic file is 149/600 LOC; the highest complexity is 4/15.",
+      "circular_dependencies": {
+        "status": "PASS",
+        "method": "Not tool-derived, and deliberately not asserted as a tool number. No dependency-graph tool (madge / dependency-cruiser) is declared in agentic.config.yaml, and none would have anything to analyze: this repo has no bundler, no ES modules, and no import/export statements between site files.",
+        "evidence": "`grep -n \"<script\" presentations/*/index.html` returns a flat, linear load order per page — mudanca-para-negocio: utils.js, cards.js, video.js, main.js; template-driven-ui: utils.js, scenario.js, practices.js, main.js. Modules communicate only by attaching to the window.Hotsite global. There is no import graph in which a cycle could exist, so the metric is structurally inapplicable rather than measured-as-zero.",
+        "changeset_effect": "This commit deletes one script tag per page (hero-scene.js) and adds none."
+      },
+      "fan_out": {
+        "value": 3,
+        "threshold": 7,
+        "status": "PASS",
+        "detail": "presentations/mudanca-para-negocio/js/main.js references Hotsite.cards, Hotsite.videoPlayer, Hotsite.setupInView (3, down from 4 — Hotsite.heroScene removed). template-driven-ui/js/main.js references Hotsite.scenario, Hotsite.practices, Hotsite.setupInView (3, down from 4). Coupling decreased."
+      },
+      "fan_in": {
+        "value": 0,
+        "threshold": 20,
+        "status": "PASS",
+        "detail": "No new module is introduced that anything depends on; scripts/verify-hero-pan.cjs has no dependents."
+      },
+      "shallow_split_check": {
+        "status": "NOT_APPLICABLE_BUT_VERIFIED",
+        "detail": "No LOC hard-fail was fixed by a file split in this changeset, so the anti-gaming rule has no trigger. Verified anyway that the change is a genuine deletion rather than a navigation-cost split: presentations/*/js/hero-scene.js (91 LOC each) was removed outright, hero.css shrank 201->140 and 182->138, and fan-out went down, not up. Nothing was forwarded to a new layer."
+      },
+      "duplication_between_bundles": {
+        "status": "NOT_A_FINDING",
+        "detail": "The two hero.css hero-photo blocks and the two index.html <picture> blocks are near-identical. CLAUDE.md states the repo's own convention explicitly: 'Nothing is shared between presentation bundles or with the root — copy-paste, not import, is the reuse mechanism here.' The changeset conforms to the documented convention, so this is not raised as a DRY violation."
+      },
+      "solid_findings": {
+        "count": 0,
+        "detail": "No SOLID violation could be substantiated with a quoted offending span plus a named principle, so none is reported. Candidate smells considered and deliberately discarded as unsubstantiable: the `record` helper at scripts/verify-hero-pan.cjs:29 both formats and performs console I/O while mutating the module-level `failures` array, but at 5 lines and complexity 4 inside a single-purpose verification script this does not rise to a defensible SRP finding, and inventing one to have something to report would be worse than reporting zero."
+      }
+    },
+    "warnings": [
+      {
+        "id": "WD-W1",
+        "severity": "WARN",
+        "category": "dead-code",
+        "file": "presentations/mudanca-para-negocio/js/utils.js, presentations/template-driven-ui/js/utils.js",
+        "finding": "js/utils.js is now 100% unreferenced in BOTH bundles, yet is still loaded on every page load via <script src=\"js/utils.js\"> (mudanca index.html:335, template-driven-ui index.html:437).",
+        "evidence": "`git grep -n \"Hotsite.utils\" 979e219 -- presentations/*/js` shows the deleted hero-scene.js was the SOLE consumer of both Hotsite.utils.prefersReducedMotion() and Hotsite.utils.random() in each bundle (7 call sites per bundle, all inside hero-scene.js). Post-commit, `grep -rn \"utils|prefersReducedMotion|random\" presentations/*/js/ | grep -v \"/js/utils.js:\"` returns zero results.",
+        "impact": "Two dead HTTP requests and dead global API surface on every page. Non-blocking: crosses no threshold.",
+        "fix": "Either remove js/utils.js and its two <script> tags, or keep it deliberately and record why."
+      },
+      {
+        "id": "WD-W2",
+        "severity": "WARN",
+        "category": "dead-code",
+        "file": "presentations/mudanca-para-negocio/css/animations.css, presentations/template-driven-ui/css/animations.css",
+        "finding": "Orphaned @keyframes left behind by the deleted SVG scene. mudanca-para-negocio: star-twinkle, blink-light, panel-track, antenna-ping, antenna-tip-pulse, flame-pulse — lines 1-30 of a 51-line file (59% of the file is dead). template-driven-ui: star-twinkle, blink-light, dash-flow, core-pulse.",
+        "evidence": "For each listed keyframe, `grep -rn 'animation:[^;]*<name>|animation-name:[^;]*<name>' presentations/<slug>/css/` returns 0 references. The rules that used them (.star, .solar-array, .antenna-ring, .antenna-tip, .rocket-flame, .hub-light, .connection-line, .template-core, .core-light) were all deleted from hero.css by this commit.",
+        "impact": "Dead CSS shipped to every visitor. Non-blocking: animations.css is 51/85 LOC, far under the 400 soft cap.",
+        "fix": "Delete the 10 orphaned @keyframes blocks across the two animations.css files."
+      },
+      {
+        "id": "WD-W3",
+        "severity": "WARN",
+        "category": "gate-scope",
+        "file": "agentic.config.yaml",
+        "finding": "scripts/**/*.cjs falls outside the `files` glob of eslint.static.config.mjs ([\"js/**/*.js\", \"presentations/**/*.js\"]), so the static-structure gate reports a FALSE GREEN on the new script.",
+        "evidence": "`npx --yes eslint --config eslint.static.config.mjs scripts/verify-hero-pan.cjs` exits 0 — but vacuously: zero rules are applied because no config block matches the path. The verifier had to re-measure complexity/depth/params with its own matching config to obtain the numbers reported above. The measured values happen to pass, but that is luck, not gating.",
+        "impact": "Any future edit to the verification script itself is ungoverned by the structural gate.",
+        "fix": "Add scripts/**/*.{js,cjs,mjs} to the files globs in eslint.static.config.mjs and eslint.config.mjs, and to the sast command's path list in agentic.config.yaml."
+      },
+      {
+        "id": "WD-W4",
+        "severity": "WARN",
+        "category": "spec-accuracy",
+        "file": "agent-handoffs/specs/hero-lateral-travelling-photos/hero-lateral-travelling-photos.v1.sealed.yaml",
+        "line": 104,
+        "finding": "The sealed spec's Notes assert '(outros usos do util em cada bundle continuam intactos)' — that other uses of Hotsite.utils survive in each bundle. This is factually false: per WD-W1 there are zero other uses, in either bundle.",
+        "impact": "Informational only. The statement lives in Notes, not in acceptance_criteria or nfrs, so no acceptance criterion is invalidated and NO re-seal is required. Flagged so spec-judge is aware the premise was wrong, in case it informed the decision to keep utils.js."
+      }
+    ],
+    "requiredFixes": [
+      "No blocking fix required for Stage 5 — every measured Watchdog metric is inside its threshold and no substantiable SOLID violation exists. The four WARN items above (WD-W1..WD-W4) are forward-fix, non-blocking, and should be picked up by the owning frontend build agent in a follow-up rather than gating this merge.",
+      "Cross-pass note routed here for visibility, not affecting this PASS: 4 of the 7 blocking tier-1 checks declared in the agentic.config.yaml committed by THIS changeset do not reproduce from a clean checkout of 7f17c2a. See the QaVerdict contractViolations for the measured exit codes."
+    ]
+  }
+}
