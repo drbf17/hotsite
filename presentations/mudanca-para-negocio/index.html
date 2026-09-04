@@ -15,12 +15,14 @@
 <link rel="stylesheet" href="css/positioning.css" />
 <link rel="stylesheet" href="css/video.css" />
 <link rel="stylesheet" href="css/animations.css" />
+<link rel="stylesheet" href="css/deck.css" />
 </head>
 <body>
+<script src="js/deck.js"></script>
 
 <a class="back-to-menu" href="../../index.html">&larr; Apresentações</a>
 
-<section id="hero" class="hero">
+<section id="hero" class="hero slide">
   <div class="hero__photo" aria-hidden="true">
     <picture class="hero__photo-frame">
       <source srcset="assets/hero.webp" type="image/webp" />
@@ -50,7 +52,7 @@
   </div>
 </section>
 
-<section id="cards" class="cards-section section">
+<section id="cards" class="cards-section section slide">
   <div class="container">
     <div class="section-heading">
       <span class="section-heading__eyebrow">Antes e depois</span>
@@ -268,7 +270,7 @@
   </div>
 </section>
 
-<section id="results" class="results-section section">
+<section id="results" class="results-section section slide">
   <div class="container">
     <div class="section-heading">
       <span class="section-heading__eyebrow">Resultados</span>
@@ -301,7 +303,7 @@
   </div>
 </section>
 
-<section id="positioning" class="positioning-section section">
+<section id="positioning" class="positioning-section section slide">
   <div class="container">
     <div class="positioning">
       <span class="positioning__eyebrow">Posicionamento</span>
@@ -311,7 +313,7 @@
   </div>
 </section>
 
-<section id="video" class="video-section section">
+<section id="video" class="video-section section slide">
   <div class="container">
     <div class="section-heading">
       <span class="section-heading__eyebrow">Transformação</span>
@@ -332,6 +334,8 @@
   </div>
 </section>
 
+<script src="js/utils.js"></script>
+<script src="js/deck-nav.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/video.js"></script>
 <script src="js/main.js"></script>

@@ -1,0 +1,186 @@
+/* ---------------------------------------------------------------------------
+ * Slide-deck orchestration layer.
+ *
+ * Every rule here is scoped behind `html.deck-active`, which js/deck.js adds
+ * synchronously (before any <section> is even parsed) as the very first
+ * thing it does. That makes this file's scoping class the progressive-
+ * enhancement boundary: if JS is disabled/blocked or js/deck.js fails to
+ * load, `.deck-active` is never added, none of these rules ever match, and
+ * the page renders exactly like today's continuous-scroll layout with zero
+ * extra markup/CSS needed for that fallback.
+ *
+ * The 300ms figure below is the spec-writer's anchored default (see the
+ * sealed spec's deferred_decisions) — not a value confirmed literally by the
+ * PO, but the acceptance criteria don't test the exact number, only that
+ * prefers-reduced-motion collapses it to an instant cut. That collapse is
+ * inherited for free from css/reset.css's existing global
+ * `@media (prefers-reduced-motion: reduce)` rule (zeroes animation-duration
+ * repo-wide) — no JS reimplementation of that check is needed here.
+ * --------------------------------------------------------------------------- */
+
+:root {
+  --deck-transition-duration: 300ms;
+}
+
+html.deck-active,
+html.deck-active body {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Every section wired into the deck (see js/deck.js's SLIDES list) gets the
+   generic .slide class in the markup. Hidden by default; only the slide
+   carrying .is-active (added/moved by js/deck.js) is shown. */
+html.deck-active .slide {
+  display: none;
+}
+
+html.deck-active .slide.is-active {
+  display: flex;
+  flex-direction: column;
+  /* Centering reads better for the shorter slides (results/positioning/
+     video), but .hero keeps its own higher-specificity justify-content:
+     flex-end from hero.css untouched (single class vs. two classes here
+     would otherwise fight — hero.css wins because a two-class selector
+     always beats a one-class one, so this line never actually reaches
+     .hero). #cards overrides this back to flex-start below. */
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Content taller than the viewport (e.g. the 12-card grid) scrolls inside
+     its own slide instead of growing the page — satisfies "100vh/100vw,
+     no page-level scroll, nothing essential clipped" simultaneously. */
+  overflow-y: auto;
+  animation: deck-slide-in var(--deck-transition-duration) var(--ease-standard);
+}
+
+/* #cards is the one slide whose content (12 cards) reliably exceeds the
+   viewport height. Centering an OVERFLOWING flex container makes the
+   browser allocate negative leading space that plain scrolling can never
+   reach, permanently hiding the top rows — flex-start keeps every card
+   reachable by scroll and matches how this section already looks in the
+   pre-deck continuous-scroll layout. The #id bumps specificity above the
+   generic .slide.is-active rule above without touching any other slide. */
+html.deck-active #cards.slide.is-active {
+  justify-content: flex-start;
+}
+
+@keyframes deck-slide-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Force an exact, literal instant cut under reduced motion. The repo-wide
+   rule in css/reset.css already zeroes animation/transition durations to
+   ~0.001ms (not exactly 0s) as a near-imperceptible default; the deck's own
+   slide transition is explicitly forced to a true 0s here to satisfy the
+   spec's "instant cut, no animation" wording precisely, reusing
+   Hotsite.utils.prefersReducedMotion() on the JS side (js/deck.js's debounce
+   lock) for the same reduced-motion signal. */
+@media (prefers-reduced-motion: reduce) {
+  html.deck-active .slide.is-active {
+    animation: none;
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+}
+
+/* ---- Nav chrome (built by js/deck-nav.js) ----------------------------- */
+.deck-nav {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-md);
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.5em 0.75em;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 10, 31, 0.45);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.deck-nav__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  color: var(--color-white);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    opacity var(--duration-fast) var(--ease-standard);
+}
+
+.deck-nav__btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.deck-nav__btn:focus-visible,
+.deck-nav__dot:focus-visible {
+  outline: 2px solid var(--color-orange-400);
+  outline-offset: 2px;
+}
+
+.deck-nav__btn.is-disabled {
+  opacity: 0.35;
+}
+
+.deck-nav__dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.deck-nav__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.deck-nav__dot:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.deck-nav__dot.is-active {
+  background: var(--color-orange-500);
+  transform: scale(1.25);
+}
+
+.deck-counter {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 30;
+  padding: 0.4em 0.9em;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 10, 31, 0.45);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .deck-nav {
+    gap: var(--space-2xs);
+    padding: 0.4em 0.6em;
+  }
+
+  .deck-nav__btn {
+    width: 2rem;
+    height: 2rem;
+    font-size: var(--fs-md);
+  }
+}
