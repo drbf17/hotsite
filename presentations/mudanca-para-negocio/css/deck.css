@@ -28,7 +28,7 @@ html.deck-active body {
   overflow: hidden;
 }
 
-/* Every section wired into the deck (see js/deck.js's SLIDES list) gets the
+/* Every section wired into the deck (see js/deck.js's SLIDE_IDS constant) gets the
    generic .slide class in the markup. Hidden by default; only the slide
    carrying .is-active (added/moved by js/deck.js) is shown. */
 html.deck-active .slide {

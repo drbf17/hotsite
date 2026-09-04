@@ -12,11 +12,15 @@ window.Hotsite = window.Hotsite || {};
  * class is simply never added and the page renders as today's plain
  * continuous scroll — no separate <noscript> override needed.
  *
- * Slide order/count lives in ONE place: the SLIDES array below. Adding,
+ * Slide order/count lives in ONE place: the SLIDE_IDS constant below. Adding,
  * removing or reordering a slide means editing only that list — every other
  * piece (keyboard, buttons, dots, counter, deep-link, history) reads it back
- * out and never hardcodes a section name.
+ * out (via Hotsite.deck.slides, set from this constant in init()) and never
+ * hardcodes a section name.
  * --------------------------------------------------------------------------- */
+
+// Single source of truth for slide order/count — see the block comment above.
+var SLIDE_IDS = ['hero', 'cards', 'results', 'positioning', 'video'];
 
 (function () {
   var root = document.documentElement;
@@ -28,7 +32,7 @@ window.Hotsite = window.Hotsite || {};
 
   document.addEventListener('DOMContentLoaded', function () {
     try {
-      Hotsite.deck.init(['hero', 'cards', 'results', 'positioning', 'video']);
+      Hotsite.deck.init(SLIDE_IDS);
     } catch {
       // Any unexpected bootstrap failure must never leave a blank page:
       // drop back to the pre-deck continuous-scroll layout instead.
@@ -71,11 +75,17 @@ Hotsite.deck = {
 
   // Reads `?slide=N` (1-indexed) straight off location.search, without the
   // URLSearchParams global, so this keeps working identically under file://.
+  // A valid value only ever needs to match /^[0-9]+$/, so the raw
+  // (still percent-encoded) capture is validated directly against the digit
+  // regex — no decodeURIComponent step is needed, and none is attempted, so
+  // malformed percent-escapes (e.g. `?slide=%`) can never throw a URIError
+  // here. Anything that isn't a bare run of digits (encoded or not) simply
+  // fails the regex and falls back to slide 1, per AC1.
   parseSlideParam: function () {
     var total = Hotsite.deck.slides.length;
     var search = window.location.search || '';
     var match = /(?:^\?|&)slide=([^&]*)/.exec(search);
-    var raw = match ? decodeURIComponent(match[1]) : '';
+    var raw = match ? match[1] : '';
     var isNumeric = /^[0-9]+$/.test(raw);
     var n = isNumeric ? parseInt(raw, 10) : NaN;
     var valid = n >= 1 && n <= total;

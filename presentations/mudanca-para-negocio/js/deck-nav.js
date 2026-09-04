@@ -3,7 +3,7 @@ window.Hotsite = window.Hotsite || {};
 /* ---------------------------------------------------------------------------
  * Deck navigation chrome: prev/next buttons, dot indicators, and the
  * current/total counter. Generated entirely from the slide list handed to
- * build() (see js/deck.js's SLIDES array) — no per-slide markup exists in
+ * build() (see js/deck.js's SLIDE_IDS constant) — no per-slide markup exists in
  * index.html, so adding/reordering a slide there never requires touching
  * this file. Appended once to <body>, so it is present (and reachable via
  * Tab) regardless of which slide is currently active.

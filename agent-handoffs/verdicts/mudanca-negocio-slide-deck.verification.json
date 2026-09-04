@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "VerificationLog",
+  "spec_id": "mudanca-negocio-slide-deck",
+  "content_hash": "sha256:c336f75bacd0cc82d962b93ebb8ae359325d64663467352111858a89aaeceafa",
+  "parent_hash": null,
+  "produced_by": {
+    "agent": "frontend-dev",
+    "repo": "drbf17/hotsite",
+    "run_id": "fix-round-1-qa-block-1",
+    "model_version": "claude-sonnet-5"
+  },
+  "produced_at": "2026-09-04T01:41:15Z",
+  "note": "Fix round on feature/mudanca-negocio-slide-deck, previous HEAD 4d61161. Scope: QA-BLOCK-1 (High) — decodeURIComponent(match[1]) in parseSlideParam() threw an uncaught URIError on malformed ?slide= values (e.g. '?slide=%'), which escaped to the bootstrap-level try/catch in the deck.js IIFE and collapsed the whole deck into the continuous-scroll no-JS fallback (all 5 sections visible, no counter, URL never normalized) instead of the AC1-required silent fallback to slide 1 with the URL normalized to ?slide=1. Fix: dropped the decodeURIComponent call entirely — a valid ?slide= value only ever needs to match /^[0-9]+$/, so the raw (still percent-encoded) capture is validated directly against that regex; any malformed/percent-escaped/non-numeric value now simply fails the regex and falls back to slide 1, and no decode step exists that can throw. Also, while in scope: fixed dev/watchdog-flagged stale comments in deck.js, deck-nav.js, and css/deck.css that referred to a non-existent 'SLIDES' array — named the actual slide-order array literal (previously inline at the Hotsite.deck.init(...) call site) as an explicit SLIDE_IDS constant and updated all three cross-file comments to point at it. Did not touch scripts/verify-mudanca-negocio-slide-deck.cjs or agentic.config.yaml (qa-engineer's concurrent scope on this same branch).",
+  "merge_candidate": {
+    "branch": "feature/mudanca-negocio-slide-deck",
+    "base": "origin/main"
+  },
+  "payload": {
+    "spec_id": "mudanca-negocio-slide-deck",
+    "config_hash": "sha256:34373ae7174b6de2669228773a42d792487cea4960e96a9cecbaaaa30c5f023b",
+    "files_touched": [
+      "presentations/mudanca-para-negocio/js/deck.js",
+      "presentations/mudanca-para-negocio/js/deck-nav.js",
+      "presentations/mudanca-para-negocio/css/deck.css"
+    ],
+    "runs": [
+      {
+        "check_id": "lint-html",
+        "category": "lint",
+        "stage": "dev-loop",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "lint-js",
+        "category": "lint",
+        "stage": "dev-loop",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "lint-css",
+        "category": "lint",
+        "stage": "dev-loop",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "typecheck",
+        "category": "typecheck",
+        "stage": "dev-loop",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "static-structure",
+        "category": "static",
+        "stage": "dev-loop",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "sast",
+        "category": "sast",
+        "stage": "pre-push",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z"
+      },
+      {
+        "check_id": "e2e-mudanca-negocio-slide-deck",
+        "category": "e2e",
+        "stage": "pre-push",
+        "exit_code": 0,
+        "passed": true,
+        "enforcement": "blocking",
+        "assertions_total": 84,
+        "assertions_passed": 84,
+        "assertions_failed": 0,
+        "notes": 1,
+        "attempt": 1,
+        "at": "2026-09-04T01:41:15Z",
+        "caveat": "Owned by qa-engineer and possibly mid-edit concurrently on this branch; run here only to confirm no regression from this fix, not as this agent's authoritative gate verdict."
+      }
+    ],
+    "manual_repro": [
+      {
+        "description": "Opened presentations/mudanca-para-negocio/index.html?slide=% (the exact malformed value from QA-BLOCK-1) in a real headless Chromium instance via Playwright, before and after the fix.",
+        "before_fix": {
+          "visible_slides": ["hero", "cards", "results", "positioning", "video"],
+          "counter_text": "",
+          "url": "...index.html?slide=%",
+          "page_errors": [],
+          "verdict": "confirmed bug: collapsed to continuous-scroll fallback, URL never normalized, no functional counter"
+        },
+        "after_fix": {
+          "visible_slides": ["hero"],
+          "counter_text": "1 / 5",
+          "url": "...index.html?slide=1",
+          "page_errors": [],
+          "verdict": "AC1-compliant: silent fallback to slide 1, URL normalized via replaceState, zero errors"
+        }
+      }
+    ],
+    "waivers_active": []
+  }
+}
