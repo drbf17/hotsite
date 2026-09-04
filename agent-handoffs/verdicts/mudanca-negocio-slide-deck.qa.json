@@ -1,0 +1,207 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "QaVerdict",
+  "spec_id": "mudanca-negocio-slide-deck",
+  "content_hash": "sha256:c336f75bacd0cc82d962b93ebb8ae359325d64663467352111858a89aaeceafa",
+  "parent_hash": null,
+  "produced_by": {
+    "agent": "qa-engineer (Stage 3)",
+    "repo": "drbf17/hotsite",
+    "run_id": "qa-2026-09-03T00:00:00Z",
+    "model_version": "claude-sonnet-5"
+  },
+  "produced_at": "2026-09-03T00:00:00Z",
+  "payload": {
+    "status": "FAIL",
+    "pinnedSpecHash": "sha256:c336f75bacd0cc82d962b93ebb8ae359325d64663467352111858a89aaeceafa",
+    "reasonForStatus": "Test harness (scripts/verify-mudanca-negocio-slide-deck.cjs) is written, wired into agentic.config.yaml as a blocking gate check (e2e-mudanca-negocio-slide-deck), and confirmed deterministic (3/3 identical runs). It currently FAILs (56 of ~90 assertions) because frontend-dev's implementation did not exist on disk at authoring/run time — presentations/mudanca-para-negocio/index.html, css/, and js/ are unmodified from the pre-spec baseline (confirmed via git diff against origin/main). This is a genuine, honest FAIL of the gate against the sealed spec's acceptance criteria, not a defect in the test suite. Re-run this check once frontend-dev's implementation lands; do not weaken any assertion to make it pass.",
+    "coverageReport": {
+      "businessLogic": null,
+      "ui": null,
+      "branch": null,
+      "measurable": false,
+      "justification": "No coverage instrumentation exists in this repo, by design (CLAUDE.md: static, build-free, no package.json/lockfile/node_modules). Reporting a percentage would be fabricated. The QA substrate here is scripts/verify-mudanca-negocio-slide-deck.cjs, a real Playwright script driving actual Chromium against file:// URLs and asserting on DOM visibility, computed styles, URL/history state, and keyboard/touch/click interaction — same precedent as scripts/verify-hero-pan.cjs and scripts/verify-agentic-first-sdlc.cjs, neither of which report coverage percentages either."
+    },
+    "mutationReport": [
+      {
+        "tier": "all",
+        "score": null,
+        "floor": null,
+        "note": "Not measurable: no mutation tool exists or is introducible without a package.json this repo prohibits. No ComponentManifest/mutationScope tags were available for this spec (none existed at authoring time). Recorded as unavailable, not as a passing or failing score."
+      }
+    ],
+    "crapScore": [
+      {
+        "file": "scripts/verify-mudanca-negocio-slide-deck.cjs",
+        "score": null,
+        "note": "CRAP = complexity x coverage requires a coverage axis that does not exist here. Structural complexity was kept low per-function (each check function is a flat, linear sequence of goto/assert steps; no function exceeds the repo's static-structure complexity budget of 15 - static-structure check passes clean)."
+      }
+    ],
+    "criteriaTraceability": {
+      "AC1_invalid_missing_out_of_range_slide_falls_back_to_1": {
+        "automated_tests": [
+          "checkFallbackAndNormalization: 5 cases (absent, ?slide=99, ?slide=0, ?slide=abc, ?slide=) each asserting only-hero-visible, counter reads '1 / 5', and URL normalized to ?slide=1",
+          "checkFallbackAndNormalization: replaceState-not-pushState sanity check via history.length"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (implementation not present yet)",
+        "gap": "None in the test's derivation from the AC. Current FAIL is purely because no deck exists yet."
+      },
+      "AC2_forward_nav_advances_exactly_one_slide": {
+        "automated_tests": [
+          "checkNavigationMechanisms: ArrowRight hero->cards, counter '2 / 5', URL ?slide=2",
+          "checkNavigationMechanisms: on-screen next-button click, same assertions",
+          "checkNavigationMechanisms: pushState creates a new history entry per transition (history.length grows by >=2 after two forward moves)"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no next-button/deck markup present yet)",
+        "gap": "Next-button located via a proposed selector contract ([data-slide-next] and 5 fallbacks) documented in the script header, since no ApiContract/ComponentManifest defines one. If frontend-dev's implementation uses a different selector, this will report 'next-button control located: FAIL' rather than a false pass — flagged, not silently accepted."
+      },
+      "AC3_backward_nav_retreats_exactly_one_slide": {
+        "automated_tests": [
+          "checkNavigationMechanisms: ArrowLeft cards->hero, counter '1 / 5'",
+          "checkNavigationMechanisms: on-screen prev-button click, same"
+        ],
+        "coverage": "COVERED (test harness) / PARTIAL PASS today (trivially true only because there is no deck: all 5 sections are simultaneously 'visible', and hero happens first in DOM order)",
+        "gap": "Two ArrowLeft/prev-button assertions currently PASS for the wrong reason (no-op today, not a real one-slide retreat) — flagged explicitly in the run log rather than treated as evidence of a working feature. Must be re-verified once the deck ships."
+      },
+      "AC4_deep_link_valid_slide_shows_directly_no_flash": {
+        "automated_tests": [
+          "checkDeepLink: sample active slide at domcontentloaded (before flash could occur) and again after load, for ?slide=3 -> 'results'",
+          "checkDeepLink: counter reads '3 / 5'",
+          "checkFileProtocolDeepLinkAndPushState: same deep-link assertion again under an explicit file:// context"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck yet)",
+        "gap": "None in derivation."
+      },
+      "AC5_boundary_no_op_at_slide_5_and_slide_1": {
+        "automated_tests": [
+          "checkBoundaries: at slide 1, ArrowLeft -> still hero, counter unchanged '1 / 5', no page error",
+          "checkBoundaries: at slide 5, ArrowRight -> still video, counter unchanged '5 / 5', no page error"
+        ],
+        "coverage": "COVERED (test harness) / PARTIAL PASS today (trivially true because there's no deck at all, not because of real boundary-clamping logic)",
+        "gap": "The 'still hero'/'still video' active-slide assertions currently pass for the wrong reason; the counter and no-page-error assertions correctly FAIL/lack a counter to check. Flagged in run output; must be re-verified once implemented."
+      },
+      "AC6_manifest_driven_slide_order_not_hardcoded_nav": {
+        "automated_tests": [
+          "checkManifestDrivenOrder: best-effort structural probe for a plausible exposed slide-order array under a few guessed global names",
+          "Behavioral consequence covered end-to-end by checkNavigationMechanisms + checkBoundaries (the 5-slide sequence hero->cards->results->positioning->video is exercised in order by every navigation test)"
+        ],
+        "coverage": "PARTIAL",
+        "gap": "This AC is fundamentally about internal code structure (a config array vs. hardcoded per-section navigation logic), which a black-box E2E script cannot directly inspect if the implementation keeps the manifest module-private (which is equally spec-compliant). Recorded as a best-effort probe plus a note, not a hard pass/fail — a code-review-level check (not available to this agent without reading frontend-dev's implementation, which the QA charter forbids doing to derive assertions) is the only way to fully close this gap. NOT silently dropped: emitted as a NOTE in the run log either way."
+      },
+      "AC7_css_hides_nonactive_slides_before_js_no_flash": {
+        "automated_tests": [
+          "checkProgressiveEnhancementCssHiding: sample non-hero section visibility at waitUntil:'commit' (as early as Playwright allows) and again after full load, under throttled network, asserting zero visible non-hero sections both times"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck CSS yet - all 5 sections currently visible by default, which is the pre-spec baseline)",
+        "gap": "Playwright cannot sample a true pre-parse instant; 'commit' (post-response-headers, pre-body-parse) is the earliest hook available, documented as the practical approximation of 'before script runs'. This is a reasonable, standard E2E approximation of a CSS-only-hiding requirement, not a compromise on the assertion itself (any non-hero visible at this point is still a real FAIL)."
+      },
+      "AC8_no_js_falls_back_to_full_scroll_layout": {
+        "automated_tests": [
+          "checkNoJsFallback: browser.newContext({ javaScriptEnabled: false }), assert all 5 sections visible (today's baseline layout)"
+        ],
+        "coverage": "COVERED",
+        "gap": "None. PASSES today because the current (pre-deck) layout already is exactly this fallback — expected and correct, since this AC describes 'same as today.'"
+      },
+      "AC9_prefers_reduced_motion_instant_cut": {
+        "automated_tests": [
+          "checkReducedMotion: browser.newContext({ reducedMotion: 'reduce' }), ArrowRight, assert the target slide is already the active one after only 50ms (no animated slide-through), and that it carries no lingering transition/animation duration"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck transition exists yet to instant-cut)",
+        "gap": "None in derivation. The 50ms sampling window is deliberately generous relative to a would-be 300ms transition (an anchored NFR default per the spec's own deferred_decisions, not a hard requirement) so this doesn't over-assert an unconfirmed exact timing value."
+      },
+      "AC10_100vh_100vw_no_page_scroll_no_clipped_content": {
+        "automated_tests": [
+          "checkNoPageScroll: for both a 375x667 mobile viewport and a 1440x900 desktop viewport, for every one of the 5 slides via ?slide=N, assert document.documentElement.scrollHeight <= innerHeight+2 and scrollWidth <= innerWidth+2"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (pre-deck layout is the full continuous-scroll page, so scrollHeight vastly exceeds innerHeight for every slide, as expected pre-implementation)",
+        "gap": "This checks 'no page-level scroll', which structurally implies 'each slide fits its viewport' but does not independently re-verify specific CTA/title elements are not clipped inside that box (a more granular per-element boundingRect-vs-viewport check was scoped out for time; the page-level scroll-absence check is the strongest single proxy available without a manifest naming which elements are 'essential')."
+      },
+      "AC11_keyboard_a11y_tab_enter_space_aria_live_counter_label": {
+        "automated_tests": [
+          "checkAccessibility: Tab up to 15 times, assert the next control receives focus; Enter on the focused next control triggers navigation",
+          "checkAccessibility: counter element carries an aria-label containing both a digit and '5'",
+          "checkAccessibility: at least one [aria-live] region exists"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no nav controls/aria-live exist yet)",
+        "gap": "Space-key activation is NOT separately asserted (only Enter) - noted as a partial gap in the automated coverage of this AC; recommend adding a Space-key variant once the real button markup exists to confirm both native activation keys work (native <button> elements get this for free, but it's worth confirming explicitly given a custom Chrome)."
+      },
+      "AC12_video_pauses_on_navigate_away_silent_on_failure": {
+        "automated_tests": [
+          "checkVideoPauseOnNavigateAway: click [data-video-play], confirm it actually plays, ArrowLeft away, assert video.paused === true, and assert zero page errors were thrown throughout"
+        ],
+        "coverage": "PARTIAL (best-effort, as explicitly invited by the task)",
+        "gap": "Video DID start playing (existing js/video.js behavior, PASS) but pause-on-navigate-away correctly FAILs today since there is no deck to navigate away with. Could not construct a reliable, non-implementation-reading way to simulate 'pause() throws before video.js is ready' (that requires either monkey-patching HTMLMediaElement.prototype.pause before the page's own script runs, or knowing the exact lifecycle hook the real implementation calls) — documented here as a best-effort limit rather than silently dropped. Recommend the build agent expose a small, deterministic hook (e.g. a custom 'hotsite:slidechange' event) so a future revision of this test can dispatch it directly with pause() overridden to throw, instead of racing real navigation."
+      },
+      "AC13_touch_card_flip_unchanged_no_swipe_navigation": {
+        "automated_tests": [
+          "checkCardsFlipUnaffected: touch-context tap on a .card, assert is-flipped toggles and the deck stays on the cards slide",
+          "checkSwipeDoesNotNavigate: synthetic touchstart/touchmove/touchend horizontal swipe on the page, assert the active slide is unchanged"
+        ],
+        "coverage": "COVERED",
+        "gap": "Both PASS today, but for different reasons per case: tap-to-flip PASSES for the right reason (js/cards.js is untouched, existing behavior confirmed working). Swipe-does-not-navigate PASSES today only because there is no deck/swipe handler of any kind yet (trivially true) - flagged as such, must be re-verified once the deck ships, since a regression that added swipe support back in would need this test to actually catch it against real deck navigation, not an absent one."
+      }
+    },
+    "edgeCaseTraceability": {
+      "EC_rapid_repeated_input_no_skip_no_desync": {
+        "automated_tests": [
+          "checkRapidInputNoDesync: fire 5 ArrowRight presses back-to-back (faster than the ~300ms anchored transition), settle, then assert exactly one slide is visible, the active slide index is within [1,5] (no overshoot), and the counter's displayed number matches the actually-visible slide (no desync)"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck/transition queueing logic exists yet)"
+      },
+      "EC_window_resize_or_rotation_mid_transition": {
+        "automated_tests": [],
+        "coverage": "NOT AUTOMATED",
+        "reason": "Reliably landing a viewport resize exactly mid-transition against a ~300ms, not-yet-implemented, unconfirmed-duration CSS transition is inherently timing-fragile and would risk being a flaky test by construction (this QA charter has zero tolerance for flakiness). Recommend revisiting once the real transition duration is implemented and can be awaited via a transitionend/animationend event rather than a wall-clock guess."
+      },
+      "EC_browser_back_steps_one_slide_at_a_time": {
+        "automated_tests": [
+          "checkBrowserBack: two ArrowRight presses then two page.goBack() calls, asserting results->cards->hero (one slide per Back), not straight out of the deck"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck yet, so nothing was pushed to step back through)"
+      },
+      "EC_video_pause_on_leaving_video_slide": {
+        "automated_tests": ["see AC12_video_pauses_on_navigate_away_silent_on_failure above"],
+        "coverage": "PARTIAL - see AC12 gap"
+      },
+      "EC_js_disabled_falls_back_to_scroll_layout": {
+        "automated_tests": ["see AC8_no_js_falls_back_to_full_scroll_layout above"],
+        "coverage": "COVERED"
+      },
+      "EC_file_protocol_deep_link_and_pushstate_parity": {
+        "automated_tests": [
+          "All checks in this script run against file:// URLs throughout (pathToFileURL), matching this repo's existing e2e precedent, which doubles as file:// coverage for every other AC/EC.",
+          "checkFileProtocolDeepLinkAndPushState: one focused, explicit assertion pairing a ?slide=2 deep link with a subsequent in-deck navigation, both under file://"
+        ],
+        "coverage": "COVERED (test harness) / FAIL (no deck yet)"
+      },
+      "EC_pushstate_replacestate_failure_in_restrictive_sandbox": {
+        "automated_tests": [],
+        "coverage": "NOT AUTOMATED",
+        "reason": "This is an explicit deferred_decision in the sealed spec itself (owner: PO, expires 2026-10-03, not yet confirmed even at seal time). Reliably forcing history.pushState/replaceState to throw inside a real Chromium page (short of monkey-patching before the app's own script runs, which risks testing the monkey-patch rather than the app) was judged out of proportion to a still-deferred requirement. Recommend revisiting once the PO resolves the deferred decision and/or the implementation exposes a fallback path this test can target directly."
+      },
+      "EC_print_shows_only_current_slide_default_browser_behavior": {
+        "automated_tests": [],
+        "coverage": "NO ASSERTION NEEDED",
+        "reason": "The sealed spec itself accepts default browser print behavior as the expected result (out of scope for a dedicated print layout) — there is no behavior here to assert against beyond 'the browser does what it always does,' which this suite does not touch or interfere with."
+      },
+      "EC_tap_on_card_always_flips_never_navigation": {
+        "automated_tests": ["see AC13_touch_card_flip_unchanged_no_swipe_navigation above"],
+        "coverage": "COVERED"
+      }
+    },
+    "flakinessLog": [
+      {
+        "testId": "scripts/verify-mudanca-negocio-slide-deck.cjs (full suite)",
+        "window": 20,
+        "runsObserved": 3,
+        "failures": 3,
+        "quarantined": false,
+        "note": "3/3 runs produced byte-identical output (diffed run-to-run) — deterministic, non-flaky failure due to missing implementation, not intermittent test instability. Not quarantined: a consistently-failing test pinned to a real gap is not a flaky test."
+      }
+    ],
+    "contractViolations": [
+      "No ApiContract exists for this spec (there is no API — it's a purely client-side static deck), and no ComponentManifest/WireframeSpec artifact was produced or found in agent-handoffs/ at authoring time (needs_prototype: true was set, but no wireframe output existed). This QA harness therefore had to propose its own selector contract for the deck's chrome (next/prev buttons, dots, counter) from the spec's prose vocabulary and this repo's existing data-attribute convention, documented in scripts/verify-mudanca-negocio-slide-deck.cjs's file header. This is not a violation by frontend-dev (nothing was implemented yet to diverge), but it IS a process gap worth flagging: if frontend-dev's eventual implementation uses different selector names, every control-dependent assertion in this suite will report a named 'control located: FAIL' rather than a false pass or a silent skip - which is by design, but will require a coordination pass (either frontend-dev adopts this file's documented selector contract, or this file is updated to match a real, reviewed contract - never the reverse of silently relaxing an assertion to fit whatever selectors happen to exist).",
+      "Fixed an unrelated, pre-existing typecheck-gate failure discovered while running the full pre-push battery before committing: js/selection.js, presentations/mudanca-para-negocio/js/video.js, and presentations/template-driven-ui/js/practices.js were missing JSDoc DOM-cast fixes already applied and verified on a separate, not-yet-merged branch (commit a5b9348, 'fix(config): record git workflow and repair the failing typecheck gate') that is not an ancestor of this branch's HEAD (249e3ff). Reapplied the identical, type-only casts here so this branch's own pre-push/gate `typecheck` check is genuinely green rather than pinned to a config note describing a fix that wasn't actually present on disk for this branch. Zero runtime behavior changed."
+    ]
+  }
+}

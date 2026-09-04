@@ -5,7 +5,7 @@ Hotsite.videoPlayer = {
     var wrap = document.querySelector('[data-video-player]');
     if (!wrap) return;
 
-    var videoEl = wrap.querySelector('[data-video-el]');
+    var videoEl = /** @type {HTMLVideoElement} */ (wrap.querySelector('[data-video-el]'));
     var playBtn = wrap.querySelector('[data-video-play]');
 
     playBtn.addEventListener('click', function () {

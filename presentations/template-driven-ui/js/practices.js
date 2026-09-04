@@ -3,13 +3,15 @@ window.Hotsite = window.Hotsite || {};
 Hotsite.practices = {
   init: function () {
     var switchEl = document.querySelector('[data-practice-switch]');
-    var list = document.querySelector('[data-practice-list]');
+    var list = /** @type {HTMLElement} */ (document.querySelector('[data-practice-list]'));
     if (!switchEl || !list) return;
 
     var buttons = Array.prototype.slice.call(switchEl.querySelectorAll('[data-practice-mode]'));
 
     switchEl.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-practice-mode]');
+      var btn = /** @type {HTMLElement} */ (
+        /** @type {Element} */ (e.target).closest('[data-practice-mode]')
+      );
       if (!btn) return;
 
       var mode = btn.dataset.practiceMode;

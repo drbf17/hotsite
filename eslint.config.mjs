@@ -49,12 +49,16 @@ export default [
         process: "readonly",
         __dirname: "readonly",
         console: "readonly",
+        // Node builtin global (available since Node 10, no import needed).
+        URL: "readonly",
         // DOM globals referenced inside page.evaluate() callback bodies —
         // lint-parsed as ordinary code even though they run in a separate
         // browser context at test time, not in this Node process.
         window: "readonly",
         document: "readonly",
         getComputedStyle: "readonly",
+        TouchEvent: "readonly",
+        Touch: "readonly",
       },
     },
     rules: {

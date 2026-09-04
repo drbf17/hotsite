@@ -1,6 +1,6 @@
 schema_version: "1.0"
 artifact_type: RepoVerificationConfig
-content_hash: "sha256:430ec0d8706540ec73793bf387fc6e2726decb7032526f8e89b658995f0957a3"
+content_hash: "sha256:34373ae7174b6de2669228773a42d792487cea4960e96a9cecbaaaa30c5f023b"
 produced_by:
   agent: "config-agent"
   repo: "drbf17/hotsite"
@@ -8,6 +8,24 @@ produced_by:
   model_version: "claude-sonnet-5"
 produced_at: "2026-08-22T22:25:56Z"
 amendments:
+  - amended_at: "2026-09-03T00:00:00Z"
+    amended_by: "qa-engineer (build phase, mudanca-negocio-slide-deck)"
+    reason: >
+      Added e2e-mudanca-negocio-slide-deck to gate the sealed spec's slide-deck
+      conversion of presentations/mudanca-para-negocio. Written and run in
+      parallel with frontend-dev's implementation per the Stage 3 QA charter
+      (tests derived from the sealed spec's acceptance_criteria/edge_cases,
+      never from reading the implementation). At authoring time the
+      implementation did not exist yet, so the check currently fails
+      (56/~90 assertions) for that reason alone — recorded as a known,
+      documented gap, not silently weakened. Also repairs a pre-existing,
+      unrelated typecheck-gate failure discovered while running the full
+      dev-loop/pre-push suite before committing (js/selection.js,
+      presentations/mudanca-para-negocio/js/video.js,
+      presentations/template-driven-ui/js/practices.js were missing the
+      JSDoc DOM-cast fix already applied on another, not-yet-merged branch at
+      commit a5b9348 — reapplied here, type-only, zero runtime change).
+
   - amended_at: "2026-08-22T23:10:00Z"
     amended_by: "frontend-dev (build phase, hero-lateral-travelling-photos)"
     reason: "added e2e-hero-pan check to validate the sealed spec's acceptance criteria in a real browser"
@@ -165,5 +183,49 @@ payload:
         spec-judge run stopped at iteration 1 (avg 0.41 / max 0.70, above the
         seal thresholds), so these encode requirements as agreed with the PO
         in review and must be revisited if the spec is later sealed.
+
+    - id: e2e-mudanca-negocio-slide-deck
+      category: e2e
+      command: "NODE_PATH=\"$(npm root -g)\" node scripts/verify-mudanca-negocio-slide-deck.cjs"
+      pass_when: "exit_code == 0"
+      enforcement: blocking
+      scope: "presentations/mudanca-para-negocio/**"
+      runs_in: [pre-push, gate]
+      verified_at: "2026-09-03T00:00:00Z"
+      typical_duration_seconds: 12
+      note: >
+        Validates the mudanca-negocio-slide-deck sealed spec (content_hash
+        sha256:c336f75bacd0cc82d962b93ebb8ae359325d64663467352111858a89aaeceafa)
+        end to end in a real Chromium instance, written from the sealed spec's
+        acceptance_criteria/edge_cases in parallel with frontend-dev building
+        the same feature on this branch (no ComponentManifest existed to pin
+        selectors to, so the script documents and proposes its own — see the
+        file header). Covers: ?slide= fallback/normalization for missing,
+        empty, non-numeric, zero, and out-of-range values; deep-link opening
+        directly on the target slide with no visible flash through earlier
+        slides; keyboard/button/dot navigation each moving exactly one slide
+        and updating the counter + ?slide= via pushState (a new history entry
+        per transition, verified against browser Back stepping one slide at a
+        time); boundary no-ops at slide 1 and slide 5; prefers-reduced-motion
+        collapsing the transition to an instant cut; no page-level vertical
+        scroll or horizontal overflow at a mobile and a desktop viewport;
+        non-active slides hidden via CSS essentially immediately (progressive
+        enhancement, no flash of all sections) with a companion JS-disabled
+        context asserting the full-scroll fallback; video auto-pause on
+        navigating away from the video slide; unchanged tap-to-flip on the
+        cards slide without triggering navigation; rapid repeated-input
+        desync/overshoot protection; swipe explicitly NOT navigating (pulled
+        out of scope per the seal); and Tab/Enter reachability plus an
+        aria-label/aria-live check for the counter. All assertions run
+        against file:// URLs throughout (same as this repo's other e2e
+        checks), which doubles as the file:// compatibility check the spec
+        calls for. CAVEAT (as of verified_at): frontend-dev's implementation
+        did not exist yet at the time this check was authored and first run —
+        56 of ~90 assertions failed because there is no deck markup/JS on
+        disk yet (see the QA verdict for the full list); the harness itself
+        was confirmed deterministic (3 identical runs). This check must be
+        re-run and driven green before this spec's gate can pass. Requires
+        the same one-time `npm install -g playwright && npx --yes playwright
+        install chromium` as e2e-hero-pan / e2e-agentic-first-sdlc.
 
   waivers: []

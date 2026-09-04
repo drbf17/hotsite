@@ -2,8 +2,8 @@ window.Hotsite = window.Hotsite || {};
 
 Hotsite.selectionScreen = {
   init: function () {
-    var grid = document.querySelector('[data-presentations-grid]');
-    var emptyState = document.querySelector('[data-presentations-empty]');
+    var grid = /** @type {HTMLElement} */ (document.querySelector('[data-presentations-grid]'));
+    var emptyState = /** @type {HTMLElement} */ (document.querySelector('[data-presentations-empty]'));
     if (!grid) return;
 
     var presentations = window.PRESENTATIONS || [];
