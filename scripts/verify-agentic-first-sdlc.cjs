@@ -21,18 +21,19 @@
 // CommonJS (require, not import) because Node's ESM resolver ignores NODE_PATH
 // by design — only CJS `require` honors it, which is what lets this script find
 // the globally-installed `playwright` package without a local install.
+//
+// Requires + record()/note() + the launch/run/report/exit driver live in
+// scripts/lib/verify-shared.cjs, shared with this repo's other verify-*.cjs
+// scripts (see that file's header for why it was extracted).
 
-const { chromium } = require('playwright');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
+const { presentationUrl: buildPresentationUrl, repoRoot, createReporter, runSuite } = require('./lib/verify-shared.cjs');
 
-const repoRoot = path.resolve(__dirname, '..');
 const SLUG = 'agentic-first-sdlc';
 
-const presentationUrl = pathToFileURL(
-  path.join(repoRoot, 'presentations', SLUG, 'index.html')
-).href;
+const presentationUrl = buildPresentationUrl(SLUG);
 const homeUrl = pathToFileURL(path.join(repoRoot, 'index.html')).href;
 
 // Section order mirrors the source document's thematic sequence: intro,
@@ -55,12 +56,8 @@ const EXPECTED_SECTIONS = [
 // on load via its own headline-in keyframes).
 const IN_VIEW_SECTIONS = EXPECTED_SECTIONS.filter((id) => id !== 'hero');
 
-const failures = [];
-const record = (label, ok, detail) => {
-  const line = `${ok ? 'PASS' : 'FAIL'} - ${label}${detail ? ` (${detail})` : ''}`;
-  console.log(line);
-  if (!ok) failures.push(line);
-};
+const reporter = createReporter();
+const { record } = reporter;
 
 // --- AC1: the presentation is reachable from the home listing ---
 async function checkHomeListing(browser) {
@@ -308,26 +305,17 @@ async function checkNoHorizontalOverflow(browser) {
   await context.close();
 }
 
-(async () => {
-  const browser = await chromium.launch();
-  try {
-    await checkHomeListing(browser);
-    await checkStructure(browser);
-    await checkContentInvariants(browser);
-    await checkScrollReveal(browser);
-    await checkReducedMotion(browser);
-    await checkImageFallback(browser);
-    await checkNoHorizontalOverflow(browser);
-  } finally {
-    await browser.close();
-  }
+const CHECKS = [
+  checkHomeListing,
+  checkStructure,
+  checkContentInvariants,
+  checkScrollReveal,
+  checkReducedMotion,
+  checkImageFallback,
+  checkNoHorizontalOverflow,
+];
 
-  console.log('');
-  if (failures.length) {
-    console.log(`${failures.length} check(s) failed.`);
-    process.exit(1);
-  } else {
-    console.log('All agentic-first-sdlc checks passed.');
-    process.exit(0);
-  }
-})();
+runSuite('agentic-first-sdlc', CHECKS, reporter).catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});

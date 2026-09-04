@@ -15,21 +15,17 @@
 // without a local install or npx's zero-install trick (which only resolves
 // bare specifiers for files inside its own temp-installed package tree, not
 // for external scripts like this one).
+//
+// Requires + record()/note() + the launch/run/report/exit driver live in
+// scripts/lib/verify-shared.cjs, shared with this repo's other verify-*.cjs
+// scripts (see that file's header for why it was extracted).
 
-const { chromium } = require('playwright');
-const path = require('node:path');
-const { pathToFileURL } = require('node:url');
-
-const repoRoot = path.resolve(__dirname, '..');
+const { presentationUrl, createReporter, runSuite } = require('./lib/verify-shared.cjs');
 
 const PRESENTATIONS = ['mudanca-para-negocio', 'template-driven-ui'];
 
-const failures = [];
-const record = (label, ok, detail) => {
-  const line = `${ok ? 'PASS' : 'FAIL'} — ${label}${detail ? ` (${detail})` : ''}`;
-  console.log(line);
-  if (!ok) failures.push(line);
-};
+const reporter = createReporter();
+const { record } = reporter;
 
 // Resolves a CSS custom property to its computed color the same way the
 // browser would, instead of hardcoding an rgb() literal that would silently
@@ -48,9 +44,7 @@ async function resolveColorToken(page, token) {
 }
 
 async function checkPresentation(browser, slug) {
-  const url = pathToFileURL(
-    path.join(repoRoot, 'presentations', slug, 'index.html')
-  ).href;
+  const url = presentationUrl(slug);
 
   // --- A. Default load: photo present, SVG/starfield gone, ping-pong animation wired up ---
   {
@@ -190,22 +184,11 @@ async function checkPresentation(browser, slug) {
   }
 }
 
-(async () => {
-  const browser = await chromium.launch();
-  try {
-    for (const slug of PRESENTATIONS) {
-      await checkPresentation(browser, slug);
-    }
-  } finally {
-    await browser.close();
-  }
-
-  console.log('');
-  if (failures.length) {
-    console.log(`${failures.length} check(s) failed.`);
-    process.exit(1);
-  } else {
-    console.log('All hero-pan checks passed.');
-    process.exit(0);
-  }
-})();
+runSuite(
+  'hero-pan',
+  PRESENTATIONS.map((slug) => (browser) => checkPresentation(browser, slug)),
+  reporter
+).catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});

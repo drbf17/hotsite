@@ -1,6 +1,11 @@
 schema_version: "1.0"
 artifact_type: RepoVerificationConfig
-content_hash: "sha256:34373ae7174b6de2669228773a42d792487cea4960e96a9cecbaaaa30c5f023b"
+# Recomputed this round over payload.checks only (per .claude/reference/
+# config-schema.md: "over the `checks` block"): sha256 of
+# json.dumps(yaml.safe_load(this file)['payload']['checks'], sort_keys=True,
+# separators=(',', ':')) encoded utf-8. Stated explicitly so any party can
+# reproduce it exactly.
+content_hash: "sha256:fdec479df9a4560abaacdc039ee348245e8e4d815f7735d89bc1367d1080e941"
 produced_by:
   agent: "config-agent"
   repo: "drbf17/hotsite"
@@ -8,6 +13,38 @@ produced_by:
   model_version: "claude-sonnet-5"
 produced_at: "2026-08-22T22:25:56Z"
 amendments:
+  - amended_at: "2026-09-04T02:15:00Z"
+    amended_by: "qa-engineer (fix round, mudanca-negocio-slide-deck, verifier Watchdog+QA re-check)"
+    reason: >
+      Three fixes to scripts/verify-mudanca-negocio-slide-deck.cjs ordered by
+      the verifier's Watchdog + QA passes, not a fresh authoring pass:
+      (1) WD-BLOCK-1 (hard-fail): the script was 837 LOC against the repo-wide
+      600 hard-fail ceiling. Fixed via genuine seam extraction, not an
+      artificial split — pulled the requires/record()-note()/launch-run-report
+      -exit driver and the presentation file:// URL builder duplicated
+      identically across all three verify-*.cjs scripts into a new
+      scripts/lib/verify-shared.cjs, and had all three require it. Also added
+      a `withPage` helper for the open-page/navigate/act/close shape every
+      check block repeats, and a local `trackPageErrors` helper for a
+      pattern duplicated 5x within this file. Net: this file is now 583 LOC
+      (down from 837, despite gaining 2 new check functions per fix #3 below);
+      scripts/verify-hero-pan.cjs incidentally shrank 211 -> 194 LOC and
+      scripts/verify-agentic-first-sdlc.cjs 333 -> 321 LOC as a bonus of the
+      same dedup, not a goal in itself. (2) QA-BLOCK-2: the AC1 replaceState
+      assertion (`historyLenBefore >= 1`) was vacuous (true in every possible
+      browser state). Replaced with an addInitScript-captured
+      before/after history.length comparison across the exact navigation
+      under test, asserting the delta is exactly 0 (replaceState, not
+      pushState). (3) QA-BLOCK-3: added a real assertion for edge case E8
+      (history.pushState/replaceState stubbed to throw via addInitScript ->
+      in-memory slide/counter navigation keeps working, the URL stays frozen,
+      no error is thrown/logged) and for edge case E3 (window resize fired at
+      a fixed 100ms delay into the confirmed-300ms transition, settling
+      asserted 400ms later) — both deterministic, no unconfirmed-timing race.
+      Total assertions: 92/92 passing, 5/5 identical consecutive runs (was
+      84/84 at the verifier's last independent count; the prior build-time
+      self-report of "90/90" was an estimate, not a measurement — corrected
+      here to the actual, tool-counted figure at each point in time).
   - amended_at: "2026-09-03T00:00:00Z"
     amended_by: "qa-engineer (build phase, mudanca-negocio-slide-deck)"
     reason: >
@@ -191,8 +228,8 @@ payload:
       enforcement: blocking
       scope: "presentations/mudanca-para-negocio/**"
       runs_in: [pre-push, gate]
-      verified_at: "2026-09-03T00:00:00Z"
-      typical_duration_seconds: 12
+      verified_at: "2026-09-04T02:15:00Z"
+      typical_duration_seconds: 13
       note: >
         Validates the mudanca-negocio-slide-deck sealed spec (content_hash
         sha256:c336f75bacd0cc82d962b93ebb8ae359325d64663467352111858a89aaeceafa)
@@ -201,11 +238,13 @@ payload:
         the same feature on this branch (no ComponentManifest existed to pin
         selectors to, so the script documents and proposes its own — see the
         file header). Covers: ?slide= fallback/normalization for missing,
-        empty, non-numeric, zero, and out-of-range values; deep-link opening
-        directly on the target slide with no visible flash through earlier
-        slides; keyboard/button/dot navigation each moving exactly one slide
-        and updating the counter + ?slide= via pushState (a new history entry
-        per transition, verified against browser Back stepping one slide at a
+        empty, non-numeric, zero, and out-of-range values, including a
+        precise (non-vacuous) check that normalization is a `history.length`
+        -neutral replaceState, not a pushState; deep-link opening directly on
+        the target slide with no visible flash through earlier slides;
+        keyboard/button/dot navigation each moving exactly one slide and
+        updating the counter + ?slide= via pushState (a new history entry per
+        transition, verified against browser Back stepping one slide at a
         time); boundary no-ops at slide 1 and slide 5; prefers-reduced-motion
         collapsing the transition to an instant cut; no page-level vertical
         scroll or horizontal overflow at a mobile and a desktop viewport;
@@ -215,16 +254,21 @@ payload:
         navigating away from the video slide; unchanged tap-to-flip on the
         cards slide without triggering navigation; rapid repeated-input
         desync/overshoot protection; swipe explicitly NOT navigating (pulled
-        out of scope per the seal); and Tab/Enter reachability plus an
-        aria-label/aria-live check for the counter. All assertions run
+        out of scope per the seal); Tab/Enter reachability plus an
+        aria-label/aria-live check for the counter; window resize fired at a
+        fixed point inside the confirmed 300ms transition window, asserting
+        the deck settles cleanly (edge case E3); and history.pushState/
+        replaceState stubbed to throw in a restrictive/sandboxed context,
+        asserting in-memory navigation keeps working, the URL stays frozen,
+        and nothing is thrown/logged (edge case E8). All assertions run
         against file:// URLs throughout (same as this repo's other e2e
         checks), which doubles as the file:// compatibility check the spec
-        calls for. CAVEAT (as of verified_at): frontend-dev's implementation
-        did not exist yet at the time this check was authored and first run —
-        56 of ~90 assertions failed because there is no deck markup/JS on
-        disk yet (see the QA verdict for the full list); the harness itself
-        was confirmed deterministic (3 identical runs). This check must be
-        re-run and driven green before this spec's gate can pass. Requires
+        calls for. 92/92 assertions passing, verified 5/5 identical
+        consecutive runs (harness + implementation both deterministic).
+        Requires + record()/note() + the launch-run-report-exit driver now
+        live in scripts/lib/verify-shared.cjs, shared with e2e-hero-pan and
+        e2e-agentic-first-sdlc (extracted to bring this script from 837 LOC
+        under the repo's 600-LOC Watchdog hard-fail; now 583 LOC). Requires
         the same one-time `npm install -g playwright && npx --yes playwright
         install chromium` as e2e-hero-pan / e2e-agentic-first-sdlc.
 
