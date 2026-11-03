@@ -1,0 +1,2607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Proposta executiva para evoluir o chat de IA do SuperApp de polling para streaming HTTP com Server-Sent Events." />
+  <meta name="theme-color" content="#07599f" />
+  <title>Streaming no chat de IA | SuperApp</title>
+  <style>
+    /* Deck autocontido: identidade azul e laranja inspirada na CAIXA, sem ativos externos. */
+    :root {
+      color-scheme: light;
+      --blue-950: #082b50;
+      --blue-900: #073965;
+      --blue-800: #07599f;
+      --blue-700: #0b68b2;
+      --blue-100: #e8f2fa;
+      --orange-600: #d76512;
+      --orange-500: #f27b21;
+      --orange-100: #fff0e3;
+      --ink: #16263d;
+      --muted: #53647b;
+      --muted-strong: #354963;
+      --line: #d9e3ed;
+      --surface: #f3f7fb;
+      --surface-raised: #ffffff;
+      --surface-blue: #edf4fa;
+      --radius: 16px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      background: #e7eef5;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      background:
+        radial-gradient(ellipse at 12% 9%, rgba(255, 255, 255, 0.92), transparent 38%),
+        linear-gradient(135deg, #e8f0f7 0%, #dfe9f3 100%);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--orange-500);
+      outline-offset: 3px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .deck-app {
+      display: flex;
+      min-height: 100vh;
+      min-height: 100dvh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 22px;
+    }
+
+    .deck-shell {
+      display: grid;
+      width: min(calc(100vw - 44px), calc((100dvh - 112px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      grid-template-rows: 58px minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 22px 70px rgba(17, 47, 79, 0.18), 0 3px 12px rgba(17, 47, 79, 0.06);
+    }
+
+    .deck-topbar {
+      z-index: 1;
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 30px;
+      border-bottom: 1px solid rgba(15, 54, 91, 0.09);
+      background: var(--surface-raised);
+    }
+
+    .brand-link {
+      display: inline-flex;
+      min-width: 0;
+      align-items: center;
+      gap: 11px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 9px;
+      color: #ffffff;
+      background: var(--blue-800);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.08em;
+    }
+
+    .brand-mark::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--orange-500);
+      content: "";
+    }
+
+    .brand-copy {
+      display: grid;
+      min-width: 0;
+      gap: 1px;
+      line-height: 1.15;
+    }
+
+    .brand-copy strong {
+      color: var(--blue-950);
+      font-size: 14px;
+      font-weight: 760;
+    }
+
+    .brand-copy small {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .topbar-context {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted-strong);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .topic-tag {
+      padding: 7px 11px;
+      border: 1px solid #d9e8f5;
+      border-radius: 999px;
+      color: var(--blue-900);
+      background: var(--blue-100);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .topbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--line);
+    }
+
+    .slide-viewport {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(15px, 1.8vw, 24px);
+      overflow: hidden;
+      padding: clamp(24px, 3.1vw, 48px) clamp(26px, 4vw, 64px) clamp(22px, 2.8vw, 42px);
+      background: var(--surface);
+    }
+
+    .slide.is-active {
+      animation: slide-enter 300ms var(--ease) both;
+    }
+
+    .slide-heading {
+      max-width: 1160px;
+    }
+
+    .slide-heading h1,
+    .slide-heading h2 {
+      max-width: 1120px;
+      margin: 0;
+      color: var(--blue-950);
+      font-size: clamp(2rem, 3.05vw, 3.15rem);
+      font-weight: 760;
+      letter-spacing: -0.045em;
+      line-height: 1.06;
+      text-wrap: balance;
+    }
+
+    .title-highlight {
+      color: var(--blue-700);
+    }
+
+    .slide-lead {
+      max-width: 790px;
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: clamp(0.88rem, 1.14vw, 1.05rem);
+      line-height: 1.45;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-raised);
+    }
+
+    .panel-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    /* Slide 1: ciclo atual de polling e cenário hipotético. */
+    .s1-layout {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1.42fr) minmax(245px, 0.78fr);
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 14px;
+    }
+
+    .polling-panel {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      padding: clamp(15px, 1.8vw, 24px);
+    }
+
+    .panel-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .subtle-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .actor-flow {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr) 56px minmax(0, 1fr);
+      align-items: center;
+      gap: 7px;
+      margin: auto 0 15px;
+    }
+
+    .actor-node {
+      display: grid;
+      min-width: 0;
+      min-height: 100px;
+      align-content: center;
+      gap: 5px;
+      padding: 13px;
+      border: 1px solid #dce5ef;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .actor-node--bff {
+      border-color: #b7d3e9;
+      background: var(--blue-100);
+    }
+
+    .actor-node__kind {
+      color: var(--blue-700);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+    }
+
+    .actor-node strong {
+      color: var(--blue-950);
+      font-size: clamp(0.85rem, 1.15vw, 1.06rem);
+      line-height: 1.2;
+    }
+
+    .actor-node small {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
+    .flow-connector {
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 9px;
+      text-align: center;
+    }
+
+    .flow-connector__arrow {
+      color: var(--blue-700);
+      font-size: 25px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .provider-result {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-bottom: 13px;
+      color: var(--muted-strong);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .provider-result__line {
+      width: 36%;
+      height: 1px;
+      background: var(--orange-500);
+    }
+
+    .provider-result__arrow {
+      margin-left: -10px;
+      color: var(--orange-600);
+      font-size: 19px;
+    }
+
+    .polling-lane {
+      display: grid;
+      grid-template-columns: minmax(83px, 0.36fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      padding-top: 13px;
+      border-top: 1px dashed #cbd7e3;
+    }
+
+    .polling-lane__label {
+      display: grid;
+      gap: 3px;
+    }
+
+    .polling-lane__label strong {
+      color: var(--blue-950);
+      font-size: 11px;
+    }
+
+    .polling-lane__label small {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .polling-chips {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .poll-chip {
+      padding: 6px 8px;
+      border: 1px solid #dfe7ef;
+      border-radius: 7px;
+      color: var(--muted-strong);
+      background: #f7f9fb;
+      font-size: 9px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .poll-chip--new {
+      border-color: #f3c59f;
+      color: #8d430e;
+      background: var(--orange-100);
+    }
+
+    .scene-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .problem-panel {
+      display: grid;
+      align-content: center;
+      gap: 0;
+      padding: 12px 20px;
+    }
+
+    .problem-row {
+      display: grid;
+      grid-template-columns: 31px minmax(0, 1fr);
+      gap: 11px;
+      padding: 15px 0;
+    }
+
+    .problem-row + .problem-row {
+      border-top: 1px solid #e6ecf2;
+    }
+
+    .problem-row__number {
+      color: var(--orange-600);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .problem-row h3 {
+      margin: 0 0 4px;
+      color: var(--blue-950);
+      font-size: clamp(0.83rem, 1.06vw, 0.98rem);
+      line-height: 1.28;
+    }
+
+    .problem-row p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .scenario-band {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(190px, 0.8fr);
+      align-items: center;
+      gap: 18px;
+      padding: 15px 21px;
+      border-radius: 13px;
+      color: #ffffff;
+      background: var(--blue-950);
+    }
+
+    .scenario-setup {
+      display: grid;
+      gap: 5px;
+    }
+
+    .scenario-setup span {
+      color: #ffd2ad;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .scenario-setup p {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(0.78rem, 1.08vw, 0.96rem);
+      font-weight: 650;
+      line-height: 1.3;
+    }
+
+    .scenario-math {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .scenario-math strong {
+      color: #ffffff;
+      font-size: clamp(2rem, 3.3vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 0.95;
+    }
+
+    .scenario-math span {
+      max-width: 125px;
+      color: #e1edf8;
+      font-size: 10px;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .scenario-caveat {
+      margin: 0;
+      padding-left: 14px;
+      border-left: 1px solid rgba(255, 255, 255, 0.28);
+      color: #d2e0ed;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    /* Slide 2: comparativo visual entre consulta e fluxo contínuo. */
+    .s2-content {
+      display: grid;
+      min-height: 0;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      gap: 14px;
+    }
+
+    .sequence-flow {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr);
+      align-items: center;
+      gap: 5px;
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #ffffff;
+    }
+
+    .sequence-step {
+      display: grid;
+      min-height: 67px;
+      align-content: center;
+      gap: 4px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      background: #f5f8fb;
+    }
+
+    .sequence-step--focus {
+      background: var(--blue-100);
+    }
+
+    .sequence-step__role {
+      color: var(--blue-700);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sequence-step strong {
+      color: var(--blue-950);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .sequence-step small {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.25;
+    }
+
+    .sequence-arrow {
+      color: var(--blue-700);
+      font-size: 21px;
+      text-align: center;
+    }
+
+    .mode-comparison {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .mode-panel {
+      display: grid;
+      min-width: 0;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      padding: 15px 18px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #ffffff;
+    }
+
+    .mode-panel--sse {
+      border-color: #b7d3e9;
+      background: #f9fcff;
+    }
+
+    .mode-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mode-heading h3 {
+      margin: 0;
+      color: var(--blue-950);
+      font-size: 14px;
+    }
+
+    .mode-heading span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .polling-visual,
+    .stream-visual {
+      display: flex;
+      min-height: 67px;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 13px;
+      border-radius: 9px;
+      background: #f5f7fa;
+    }
+
+    .polling-visual__checks {
+      display: flex;
+      flex: 1 1 auto;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .polling-visual__check {
+      display: grid;
+      min-width: 0;
+      flex: 1 1 0;
+      gap: 4px;
+      justify-items: center;
+      padding: 7px 4px;
+      border: 1px solid #dce4ec;
+      border-radius: 7px;
+      color: var(--muted-strong);
+      background: #ffffff;
+      font-size: 9px;
+      font-weight: 650;
+      text-align: center;
+    }
+
+    .polling-visual__check--content {
+      border-color: #f1c39e;
+      color: #8d430e;
+      background: var(--orange-100);
+    }
+
+    .visual-arrow {
+      flex: 0 0 auto;
+      color: var(--blue-700);
+      font-size: 20px;
+    }
+
+    .stream-visual {
+      position: relative;
+      overflow: hidden;
+      background: var(--blue-100);
+    }
+
+    .stream-visual__rail {
+      position: absolute;
+      right: 16px;
+      left: 16px;
+      height: 2px;
+      background: #b8d5ea;
+    }
+
+    .stream-visual__rail::after {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 38%;
+      height: 2px;
+      transform: translateY(-50%);
+      background: var(--blue-700);
+      content: "";
+      animation: stream-advance 3.2s ease-in-out infinite;
+    }
+
+    .stream-token {
+      z-index: 1;
+      padding: 7px 9px;
+      border: 1px solid #c9ddec;
+      border-radius: 7px;
+      color: var(--blue-950);
+      background: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .stream-token--accent {
+      border-color: #f1c39e;
+      color: #8d430e;
+      background: #fffaf5;
+    }
+
+    .mode-caption {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .benefit-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .benefit-item {
+      min-height: 50px;
+      padding: 10px 11px;
+      border-left: 3px solid var(--orange-500);
+      border-radius: 0 8px 8px 0;
+      color: var(--blue-950);
+      background: #ffffff;
+      font-size: 10px;
+      font-weight: 680;
+      line-height: 1.3;
+    }
+
+    .sse-direction-note {
+      margin: 0;
+      padding: 9px 12px;
+      border: 1px solid #d6e5f1;
+      border-radius: 8px;
+      color: var(--blue-900);
+      background: var(--blue-100);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    /* Slide 3: comparação de tecnologias e decisão recomendada. */
+    .s3-content {
+      display: grid;
+      min-height: 0;
+      grid-template-rows: minmax(0, 1fr) auto auto;
+      gap: 11px;
+    }
+
+    .table-wrap {
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #ffffff;
+    }
+
+    .compare-table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .compare-table thead th {
+      height: 43px;
+      padding: 9px 12px;
+      color: #ffffff;
+      background: var(--blue-950);
+      font-size: 11px;
+      font-weight: 760;
+      text-align: left;
+    }
+
+    .compare-table thead th:first-child {
+      width: 17%;
+      color: #d5e5f3;
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .compare-table thead th:nth-child(3) {
+      color: #ffffff;
+      background: var(--blue-800);
+    }
+
+    .compare-table tbody tr + tr {
+      border-top: 1px solid #e7edf3;
+    }
+
+    .compare-table tbody th,
+    .compare-table tbody td {
+      padding: 8px 12px;
+      font-size: clamp(9px, 0.81vw, 11px);
+      line-height: 1.28;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .compare-table tbody th {
+      color: var(--blue-950);
+      font-size: 10px;
+      font-weight: 750;
+      background: #f7f9fb;
+    }
+
+    .compare-table tbody td {
+      color: var(--muted-strong);
+    }
+
+    .compare-table tbody td:nth-child(3) {
+      color: var(--blue-950);
+      background: #f2f8fc;
+      font-weight: 650;
+    }
+
+    .conclusion-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      padding: 1px 3px;
+    }
+
+    .conclusion-item {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
+    .conclusion-item strong {
+      flex: 0 0 auto;
+      color: var(--blue-950);
+      font-size: 11px;
+    }
+
+    .recommendation-band {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: #ffffff;
+      background: var(--blue-950);
+    }
+
+    .recommendation-band strong {
+      color: #ffd0a8;
+      font-size: 11px;
+    }
+
+    .recommendation-band p {
+      margin: 0;
+      color: #f0f5fa;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .s3-caveat {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.3;
+    }
+
+    /* Slide 4: fluxo de arquitetura, fronteira de segurança e operação. */
+    .s4-layout {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1.3fr) minmax(255px, 0.83fr);
+      gap: 14px;
+    }
+
+    .architecture-panel {
+      display: grid;
+      min-width: 0;
+      min-height: 0;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      gap: 12px;
+      padding: clamp(15px, 1.8vw, 23px);
+    }
+
+    .architecture-title {
+      margin: 0;
+      color: var(--blue-950);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .architecture-flow {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1.15fr) 34px minmax(0, 1fr);
+      align-items: center;
+      gap: 6px;
+    }
+
+    .architecture-node {
+      display: grid;
+      min-width: 0;
+      min-height: 130px;
+      align-content: center;
+      gap: 6px;
+      padding: 14px 13px;
+      border: 1px solid #dce5ef;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .architecture-node--bff {
+      min-height: 150px;
+      border: 2px solid #7eafd4;
+      background: var(--blue-100);
+      box-shadow: inset 0 3px 0 rgba(7, 89, 159, 0.08);
+    }
+
+    .architecture-node__type {
+      color: var(--blue-700);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .architecture-node strong {
+      color: var(--blue-950);
+      font-size: clamp(0.82rem, 1.08vw, 1rem);
+      line-height: 1.18;
+    }
+
+    .architecture-node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
+    .architecture-node__boundary {
+      display: inline-flex;
+      width: fit-content;
+      max-width: 100%;
+      padding: 5px 7px;
+      border-radius: 6px;
+      color: #ffffff;
+      background: var(--blue-800);
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .arch-connector {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 8px;
+      text-align: center;
+    }
+
+    .arch-connector__arrow {
+      color: var(--blue-700);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .return-flow {
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid #f1d0b4;
+      border-radius: 9px;
+      background: #fffaf5;
+    }
+
+    .return-flow__label {
+      color: #8d430e;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .return-flow__path {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--blue-950);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .return-flow__arrow {
+      color: var(--orange-600);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .event-area {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .event-area__label {
+      max-width: 85px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .event-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .event-chip {
+      padding: 5px 7px;
+      border: 1px solid #dce6ef;
+      border-radius: 6px;
+      color: var(--blue-900);
+      background: #f5f8fb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 8px;
+      white-space: nowrap;
+    }
+
+    .azure-foundation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 13px;
+      border-radius: 9px;
+      color: #ffffff;
+      background: var(--blue-900);
+    }
+
+    .azure-foundation strong {
+      flex: 0 0 auto;
+      color: #ffffff;
+      font-size: 10px;
+    }
+
+    .azure-foundation span {
+      color: #d8e6f3;
+      font-size: 9px;
+      line-height: 1.3;
+      text-align: right;
+    }
+
+    .implementation-panel {
+      display: grid;
+      min-height: 0;
+      align-content: start;
+      gap: 12px;
+      padding: clamp(15px, 1.8vw, 23px);
+    }
+
+    .implementation-panel h3 {
+      margin: 0;
+      color: var(--blue-950);
+      font-size: 14px;
+    }
+
+    .implementation-list {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .implementation-list li {
+      position: relative;
+      padding: 9px 0 9px 15px;
+      color: var(--muted-strong);
+      font-size: 10px;
+      line-height: 1.36;
+    }
+
+    .implementation-list li + li {
+      border-top: 1px solid #e7edf3;
+    }
+
+    .implementation-list li::before {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--orange-500);
+      content: "";
+    }
+
+    .platform-note {
+      margin: auto 0 0;
+      padding: 10px 11px;
+      border-left: 3px solid var(--orange-500);
+      border-radius: 0 8px 8px 0;
+      color: var(--blue-950);
+      background: var(--orange-100);
+      font-size: 9px;
+      font-weight: 650;
+      line-height: 1.4;
+    }
+
+    /* Slide 5: adoção, riscos e fechamento. */
+    .s5-content {
+      display: grid;
+      min-height: 0;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 14px;
+    }
+
+    .s5-grid {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1.35fr);
+      gap: 12px;
+    }
+
+    .s5-panel {
+      min-width: 0;
+      padding: clamp(13px, 1.6vw, 20px);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #ffffff;
+    }
+
+    .s5-panel--risk {
+      background: #edf3f8;
+    }
+
+    .s5-panel--plan {
+      border-color: var(--blue-900);
+      color: #ffffff;
+      background: var(--blue-900);
+    }
+
+    .s5-panel h3 {
+      margin: 0 0 10px;
+      color: var(--blue-950);
+      font-size: 13px;
+    }
+
+    .s5-panel--plan h3 {
+      color: #ffffff;
+    }
+
+    .expected-label {
+      margin: -5px 0 8px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
+    .plain-list {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .plain-list li {
+      padding: 7px 0;
+      color: var(--muted-strong);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .plain-list li + li {
+      border-top: 1px solid rgba(37, 71, 106, 0.1);
+    }
+
+    .plan-list {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .plan-list li {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 8px;
+      padding: 6px 0;
+      color: #e7f0f8;
+      font-size: 9px;
+      line-height: 1.32;
+    }
+
+    .plan-list li + li {
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .plan-list__number {
+      color: #ffc18d;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .plan-list strong {
+      color: #ffffff;
+    }
+
+    .closing-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
+      align-items: center;
+      gap: 18px;
+      padding: 15px 19px;
+      border-radius: 12px;
+      color: #ffffff;
+      background: var(--blue-950);
+    }
+
+    .closing-band strong {
+      color: #ffffff;
+      font-size: clamp(1rem, 1.62vw, 1.45rem);
+      font-weight: 760;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .closing-band p {
+      margin: 0;
+      padding-left: 15px;
+      border-left: 1px solid rgba(255, 255, 255, 0.3);
+      color: #dce8f3;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    /* Navegação comum: botões, saltos por slide e progresso segmentado. */
+    .control-row {
+      display: grid;
+      width: min(calc(100vw - 44px), calc((100dvh - 112px) * 16 / 9));
+      grid-template-columns: auto minmax(120px, 1fr) auto;
+      align-items: center;
+      gap: 15px;
+      margin-top: 13px;
+    }
+
+    .control-button {
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      border: 1px solid rgba(7, 57, 101, 0.18);
+      border-radius: 9px;
+      color: var(--blue-950);
+      background: rgba(255, 255, 255, 0.86);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      transition: transform 160ms var(--ease), background-color 160ms ease, border-color 160ms ease;
+      white-space: nowrap;
+    }
+
+    .control-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: #9ebbd3;
+      background: #ffffff;
+    }
+
+    .control-button:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .control-button:disabled {
+      color: #8391a3;
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .control-button--next {
+      border-color: var(--blue-800);
+      color: #ffffff;
+      background: var(--blue-800);
+    }
+
+    .control-button--next:hover:not(:disabled) {
+      border-color: var(--blue-900);
+      background: var(--blue-900);
+    }
+
+    .control-button--fullscreen {
+      width: 37px;
+      padding: 0;
+      font-size: 17px;
+    }
+
+    .progress-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .progress-step {
+      position: relative;
+      display: block;
+      width: 100%;
+      max-width: 108px;
+      height: 8px;
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(7, 57, 101, 0.16);
+      cursor: pointer;
+    }
+
+    .progress-step::after {
+      position: absolute;
+      inset: 0;
+      transform: scaleX(0);
+      transform-origin: left center;
+      border-radius: inherit;
+      background: var(--blue-700);
+      content: "";
+      transition: transform 240ms var(--ease), background-color 160ms ease;
+    }
+
+    .progress-step.is-complete::after {
+      transform: scaleX(1);
+    }
+
+    .progress-step.is-current::after {
+      transform: scaleX(1);
+      background: var(--orange-500);
+    }
+
+    .control-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .slide-counter {
+      min-width: 42px;
+      color: var(--blue-950);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 760;
+      text-align: center;
+    }
+
+    @keyframes slide-enter {
+      from { opacity: 0.4; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes stream-advance {
+      0% { transform: translate(-15%, -50%); opacity: 0.45; }
+      50% { opacity: 1; }
+      100% { transform: translate(165%, -50%); opacity: 0.4; }
+    }
+
+    @media (max-width: 1050px) and (min-width: 701px) {
+      .deck-shell {
+        width: min(calc(100vw - 28px), calc((100dvh - 105px) * 16 / 9));
+      }
+
+      .deck-topbar {
+        padding: 0 22px;
+      }
+
+      .slide {
+        padding-right: 32px;
+        padding-left: 32px;
+      }
+
+      .scenario-band {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+      }
+
+      .scenario-caveat {
+        grid-column: 1 / -1;
+        padding: 0;
+        border: 0;
+      }
+
+      .s1-layout {
+        grid-template-columns: minmax(0, 1.1fr) minmax(225px, 0.8fr);
+      }
+
+      .compare-table tbody th,
+      .compare-table tbody td {
+        padding: 7px 8px;
+      }
+
+      .s5-grid {
+        grid-template-columns: 0.9fr 1fr 1.2fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .deck-app {
+        min-height: 100vh;
+        min-height: 100dvh;
+        justify-content: flex-start;
+        padding: 10px 10px 12px;
+      }
+
+      .deck-shell {
+        width: 100%;
+        height: calc(100dvh - 102px);
+        min-height: 0;
+        aspect-ratio: auto;
+        grid-template-rows: 52px minmax(0, 1fr);
+        border-radius: 13px;
+      }
+
+      .deck-topbar {
+        gap: 8px;
+        padding: 0 13px;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+      }
+
+      .brand-copy small {
+        max-width: 150px;
+      }
+
+      .topbar-context {
+        gap: 6px;
+        font-size: 9px;
+      }
+
+      .topic-tag {
+        padding: 6px 8px;
+        font-size: 9px;
+      }
+
+      .topbar-divider,
+      .topbar-context__detail {
+        display: none;
+      }
+
+      .slide {
+        gap: 15px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 23px 18px 22px;
+        overscroll-behavior: contain;
+      }
+
+      .slide-heading h1,
+      .slide-heading h2 {
+        font-size: clamp(1.7rem, 7.3vw, 2.3rem);
+        line-height: 1.08;
+      }
+
+      .slide-lead {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .s1-layout,
+      .s2-content,
+      .s3-content,
+      .s4-layout,
+      .s5-content {
+        display: grid;
+        min-height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      .s1-layout {
+        gap: 11px;
+      }
+
+      .polling-panel {
+        min-height: 260px;
+        padding: 14px;
+      }
+
+      .actor-flow {
+        grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1fr) 26px minmax(0, 1fr);
+        gap: 3px;
+        margin: 22px 0 13px;
+      }
+
+      .actor-node {
+        min-height: 88px;
+        padding: 8px 7px;
+      }
+
+      .actor-node__kind {
+        font-size: 7px;
+      }
+
+      .actor-node strong {
+        font-size: 11px;
+      }
+
+      .actor-node small {
+        font-size: 8px;
+      }
+
+      .flow-connector {
+        font-size: 7px;
+      }
+
+      .flow-connector__arrow {
+        font-size: 18px;
+      }
+
+      .polling-lane {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .polling-lane__label {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+
+      .polling-chips {
+        gap: 5px;
+      }
+
+      .poll-chip {
+        padding: 5px 6px;
+        font-size: 8px;
+      }
+
+      .problem-panel {
+        padding: 7px 14px;
+      }
+
+      .problem-row {
+        padding: 11px 0;
+      }
+
+      .problem-row h3 {
+        font-size: 13px;
+      }
+
+      .problem-row p {
+        font-size: 11px;
+      }
+
+      .scenario-band {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 15px;
+      }
+
+      .scenario-setup p {
+        font-size: 13px;
+      }
+
+      .scenario-math strong {
+        font-size: 42px;
+      }
+
+      .scenario-math span {
+        max-width: none;
+        font-size: 11px;
+      }
+
+      .scenario-caveat {
+        padding: 0;
+        border: 0;
+        font-size: 10px;
+      }
+
+      .s2-content {
+        gap: 11px;
+      }
+
+      .sequence-flow {
+        grid-template-columns: 1fr;
+        gap: 2px;
+        padding: 9px;
+      }
+
+      .sequence-step {
+        min-height: 54px;
+        grid-template-columns: 70px minmax(0, 1fr);
+        align-content: center;
+        align-items: center;
+        gap: 2px 8px;
+        padding: 7px 9px;
+      }
+
+      .sequence-step__role {
+        grid-row: span 2;
+      }
+
+      .sequence-step strong {
+        font-size: 11px;
+      }
+
+      .sequence-step small {
+        font-size: 9px;
+      }
+
+      .sequence-arrow {
+        height: 14px;
+        font-size: 0;
+        line-height: 14px;
+      }
+
+      .sequence-arrow::after {
+        color: var(--orange-600);
+        content: "↓";
+        font-size: 15px;
+      }
+
+      .mode-comparison {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .mode-panel {
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .polling-visual,
+      .stream-visual {
+        min-height: 58px;
+        padding: 8px;
+      }
+
+      .polling-visual__checks {
+        gap: 4px;
+      }
+
+      .polling-visual__check {
+        font-size: 8px;
+      }
+
+      .stream-token {
+        padding: 6px;
+        font-size: 9px;
+      }
+
+      .benefit-strip {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .benefit-item {
+        min-height: 54px;
+        font-size: 9px;
+      }
+
+      .sse-direction-note {
+        font-size: 10px;
+      }
+
+      .s3-content {
+        gap: 10px;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        border: 0;
+        background: transparent;
+      }
+
+      .compare-table,
+      .compare-table tbody,
+      .compare-table tr,
+      .compare-table th,
+      .compare-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .compare-table thead {
+        display: none;
+      }
+
+      .compare-table tbody {
+        display: grid;
+        gap: 8px;
+      }
+
+      .compare-table tbody tr {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #ffffff;
+      }
+
+      .compare-table tbody tr + tr {
+        border-top: 1px solid var(--line);
+      }
+
+      .compare-table tbody th {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+
+      .compare-table tbody td {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 8px;
+        padding: 7px 10px;
+        font-size: 10px;
+      }
+
+      .compare-table tbody td::before {
+        color: var(--blue-700);
+        content: attr(data-label);
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .compare-table tbody td:nth-child(3) {
+        background: #f2f8fc;
+      }
+
+      .conclusion-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .conclusion-item {
+        font-size: 10px;
+      }
+
+      .recommendation-band {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .s3-caveat {
+        font-size: 9px;
+      }
+
+      .s4-layout {
+        gap: 10px;
+      }
+
+      .architecture-panel {
+        grid-template-rows: auto auto auto auto;
+        gap: 9px;
+        padding: 13px;
+      }
+
+      .architecture-flow {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .architecture-node,
+      .architecture-node--bff {
+        min-height: 83px;
+        grid-template-columns: 1fr 1fr;
+        align-content: center;
+        align-items: center;
+        gap: 4px 8px;
+        padding: 10px;
+      }
+
+      .architecture-node__type {
+        grid-column: 1 / -1;
+      }
+
+      .architecture-node strong {
+        font-size: 12px;
+      }
+
+      .architecture-node p {
+        font-size: 9px;
+      }
+
+      .architecture-node__boundary {
+        grid-column: 1 / -1;
+      }
+
+      .arch-connector {
+        min-height: 18px;
+        font-size: 0;
+      }
+
+      .arch-connector::after {
+        color: var(--orange-600);
+        content: "↓";
+        font-size: 15px;
+      }
+
+      .arch-connector__arrow {
+        display: none;
+      }
+
+      .return-flow__path {
+        justify-content: center;
+        gap: 7px;
+        font-size: 9px;
+      }
+
+      .event-area {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .event-area__label {
+        max-width: none;
+      }
+
+      .event-chip {
+        font-size: 7px;
+      }
+
+      .azure-foundation {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .azure-foundation span {
+        text-align: left;
+      }
+
+      .implementation-panel {
+        gap: 7px;
+        padding: 14px;
+      }
+
+      .implementation-list li {
+        padding: 8px 0 8px 14px;
+        font-size: 10px;
+      }
+
+      .implementation-list li::before {
+        top: 13px;
+      }
+
+      .platform-note {
+        margin-top: 2px;
+      }
+
+      .s5-content {
+        gap: 10px;
+      }
+
+      .s5-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .s5-panel {
+        padding: 13px 15px;
+      }
+
+      .s5-panel h3 {
+        margin-bottom: 7px;
+        font-size: 13px;
+      }
+
+      .expected-label {
+        margin-bottom: 5px;
+      }
+
+      .plain-list li {
+        padding: 6px 0;
+        font-size: 10px;
+      }
+
+      .plan-list li {
+        padding: 7px 0;
+        font-size: 10px;
+      }
+
+      .closing-band {
+        grid-template-columns: 1fr;
+        gap: 9px;
+        padding: 14px;
+      }
+
+      .closing-band strong {
+        font-size: 16px;
+      }
+
+      .closing-band p {
+        padding: 0;
+        border: 0;
+        font-size: 10px;
+      }
+
+      .control-row {
+        width: 100%;
+        grid-template-columns: auto minmax(80px, 1fr) auto;
+        gap: 7px;
+        margin-top: 9px;
+      }
+
+      .control-button {
+        min-height: 34px;
+        gap: 5px;
+        padding: 0 8px;
+        font-size: 9px;
+      }
+
+      .control-button--fullscreen {
+        width: 34px;
+        padding: 0;
+      }
+
+      .progress-nav {
+        gap: 4px;
+      }
+
+      .progress-step {
+        height: 7px;
+      }
+
+      .control-right {
+        gap: 5px;
+      }
+
+      .slide-counter {
+        min-width: 35px;
+        font-size: 9px;
+      }
+
+      .deck-app:fullscreen {
+        padding: 8px;
+      }
+
+      .deck-app:fullscreen .deck-shell {
+        height: calc(100dvh - 82px);
+      }
+
+      .deck-app:fullscreen .control-row {
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .topbar-context {
+        display: none;
+      }
+
+      .control-button .control-text {
+        display: none;
+      }
+
+      .control-button {
+        width: 35px;
+        padding: 0;
+      }
+
+      .control-button--fullscreen {
+        width: 32px;
+      }
+
+      .control-right {
+        gap: 3px;
+      }
+
+      .progress-nav {
+        gap: 3px;
+      }
+
+      .progress-step {
+        height: 6px;
+      }
+    }
+
+    .deck-app:fullscreen {
+      min-height: 100vh;
+      min-height: 100dvh;
+      justify-content: center;
+      padding: 18px;
+      background: #dfe9f3;
+    }
+
+    .deck-app:fullscreen .deck-shell {
+      width: min(calc(100vw - 36px), calc((100dvh - 112px) * 16 / 9));
+    }
+
+    .deck-app:fullscreen .control-row {
+      width: min(calc(100vw - 36px), calc((100dvh - 112px) * 16 / 9));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-app" id="deckApp">
+    <div class="deck-shell">
+      <header class="deck-topbar">
+        <a class="brand-link" href="../../index.html" aria-label="Voltar para a lista de apresentações">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span class="brand-copy">
+            <strong>SuperApp</strong>
+            <small>Comunicação do chat de IA</small>
+          </span>
+        </a>
+        <div class="topbar-context" aria-label="Proposta técnica sobre streaming HTTP com SSE">
+          <span class="topic-tag">Proposta técnica</span>
+          <span class="topbar-divider" aria-hidden="true"></span>
+          <span class="topbar-context__detail">Streaming HTTP com SSE</span>
+        </div>
+      </header>
+
+      <main class="slide-viewport" id="slideViewport" aria-label="Apresentação executiva">
+        <section class="slide slide-one is-active" id="slide-1" role="group" aria-roledescription="slide" aria-label="Slide 1 de 5. O problema: polling.">
+          <header class="slide-heading">
+            <h1>Estamos consultando repetidamente quando poderíamos receber a resposta em <span class="title-highlight">tempo real.</span></h1>
+          </header>
+
+          <div class="s1-layout">
+            <section class="panel polling-panel" aria-label="Fluxo atual com polling">
+              <div class="panel-topline">
+                <span class="panel-label">Fluxo atual</span>
+                <span class="subtle-label">A resposta depende da próxima consulta</span>
+              </div>
+
+              <div class="actor-flow" role="img" aria-label="O aplicativo envia uma solicitação ao BFF, que consulta o provedor de IA. O aplicativo consulta o BFF periodicamente para verificar se há conteúdo novo.">
+                <div class="actor-node">
+                  <span class="actor-node__kind">CLIENTE</span>
+                  <strong>Aplicativo</strong>
+                  <small>inicia o pedido</small>
+                </div>
+                <div class="flow-connector" aria-hidden="true">
+                  <span>solicitação</span>
+                  <span class="flow-connector__arrow">→</span>
+                </div>
+                <div class="actor-node actor-node--bff">
+                  <span class="actor-node__kind">INTEGRAÇÃO</span>
+                  <strong>BFF</strong>
+                  <small>consulta a IA</small>
+                </div>
+                <div class="flow-connector" aria-hidden="true">
+                  <span>consulta</span>
+                  <span class="flow-connector__arrow">→</span>
+                </div>
+                <div class="actor-node">
+                  <span class="actor-node__kind">GERAÇÃO</span>
+                  <strong>Provedor de IA</strong>
+                  <small>produz a resposta</small>
+                </div>
+              </div>
+
+              <div class="provider-result" aria-hidden="true">
+                <span>Conteúdo chega ao BFF</span>
+                <span class="provider-result__line"></span>
+                <span class="provider-result__arrow">←</span>
+              </div>
+
+              <div class="polling-lane">
+                <div class="polling-lane__label">
+                  <strong>APP → BFF</strong>
+                  <small>polling periódico</small>
+                </div>
+                <div class="polling-chips" aria-label="Consultas repetidas, sem novidade até que uma delas encontre conteúdo disponível">
+                  <span class="poll-chip">há novidade?</span>
+                  <span class="poll-chip">sem novidade</span>
+                  <span class="poll-chip">há novidade?</span>
+                  <span class="poll-chip poll-chip--new">conteúdo encontrado</span>
+                </div>
+              </div>
+              <p class="scene-note">A interface só apresenta o conteúdo quando uma nova consulta o identifica.</p>
+            </section>
+
+            <aside class="panel problem-panel" aria-label="Problemas do polling">
+              <div class="problem-row">
+                <span class="problem-row__number">01</span>
+                <div>
+                  <h3>Requisições HTTP repetitivas</h3>
+                  <p>Novas chamadas mesmo quando ainda não há informação para entregar.</p>
+                </div>
+              </div>
+              <div class="problem-row">
+                <span class="problem-row__number">02</span>
+                <div>
+                  <h3>Latência artificial</h3>
+                  <p>O conteúdo pode esperar até a próxima consulta para aparecer na tela.</p>
+                </div>
+              </div>
+              <div class="problem-row">
+                <span class="problem-row__number">03</span>
+                <div>
+                  <h3>Recursos gastos sem novidade</h3>
+                  <p>Aplicativo e backend atendem consultas que não trazem conteúdo novo.</p>
+                </div>
+              </div>
+            </aside>
+
+            <div class="scenario-band" aria-label="Cenário hipotético: 5 mil usuários consultando a cada 2 segundos gerariam 2.500 requisições de consulta por segundo. Não é uma métrica real do SuperApp.">
+              <div class="scenario-setup">
+                <span>Cenário hipotético</span>
+                <p>5.000 usuários consultando a cada 2 segundos</p>
+              </div>
+              <div class="scenario-math">
+                <strong>2.500</strong>
+                <span>requisições de consulta por segundo</span>
+              </div>
+              <p class="scenario-caveat">Exemplo ilustrativo. Não representa uma métrica real do SuperApp.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide slide-two" id="slide-2" role="group" aria-roledescription="slide" aria-label="Slide 2 de 5. A solução: streaming com SSE." hidden>
+          <header class="slide-heading">
+            <h2>A resposta chega à medida que a IA produz o conteúdo.</h2>
+            <p class="slide-lead">Uma resposta HTTP permanece aberta e carrega eventos progressivamente do servidor ao aplicativo.</p>
+          </header>
+
+          <div class="s2-content">
+            <div class="sequence-flow" aria-label="Fluxo SSE: o app inicia uma requisição, o BFF mantém a conexão aberta, o provedor emite tokens, o BFF encaminha eventos e a interface renderiza a resposta incrementalmente.">
+              <div class="sequence-step">
+                <span class="sequence-step__role">Aplicativo</span>
+                <strong>Abre a requisição HTTP</strong>
+                <small>Inicia a conversa</small>
+              </div>
+              <span class="sequence-arrow" aria-hidden="true">→</span>
+              <div class="sequence-step sequence-step--focus">
+                <span class="sequence-step__role">BFF</span>
+                <strong>Mantém a conexão aberta</strong>
+                <small>Orquestra o fluxo</small>
+              </div>
+              <span class="sequence-arrow" aria-hidden="true">→</span>
+              <div class="sequence-step">
+                <span class="sequence-step__role">Provedor de IA</span>
+                <strong>Envia tokens progressivamente</strong>
+                <small>Gera conteúdo em fluxo</small>
+              </div>
+              <span class="sequence-arrow" aria-hidden="true">→</span>
+              <div class="sequence-step sequence-step--focus">
+                <span class="sequence-step__role">BFF</span>
+                <strong>Encaminha cada evento</strong>
+                <small>Sem esperar a resposta completa</small>
+              </div>
+              <span class="sequence-arrow" aria-hidden="true">→</span>
+              <div class="sequence-step">
+                <span class="sequence-step__role">Interface</span>
+                <strong>Apresenta incrementalmente</strong>
+                <small>O usuário acompanha a geração</small>
+              </div>
+            </div>
+
+            <div class="mode-comparison">
+              <article class="mode-panel" aria-label="Polling pergunta repetidamente se há novidade">
+                <div class="mode-heading">
+                  <h3>Polling</h3>
+                  <span>Pergunta de novo</span>
+                </div>
+                <div class="polling-visual" aria-hidden="true">
+                  <div class="polling-visual__checks">
+                    <span class="polling-visual__check">consulta<br />sem novidade</span>
+                    <span class="polling-visual__check">consulta<br />sem novidade</span>
+                    <span class="polling-visual__check polling-visual__check--content">consulta<br />resposta</span>
+                  </div>
+                  <span class="visual-arrow">→</span>
+                </div>
+                <p class="mode-caption">O aplicativo verifica repetidamente se há algo novo.</p>
+              </article>
+
+              <article class="mode-panel mode-panel--sse" aria-label="SSE entrega cada atualização assim que está disponível">
+                <div class="mode-heading">
+                  <h3>SSE</h3>
+                  <span>Recebe quando está disponível</span>
+                </div>
+                <div class="stream-visual" aria-hidden="true">
+                  <span class="stream-visual__rail"></span>
+                  <span class="stream-token">A resposta</span>
+                  <span class="stream-token">chega</span>
+                  <span class="stream-token stream-token--accent">agora</span>
+                </div>
+                <p class="mode-caption">O servidor envia atualizações pelo fluxo HTTP aberto.</p>
+              </article>
+            </div>
+
+            <div class="benefit-strip" aria-label="Benefícios esperados do SSE">
+              <div class="benefit-item">Menos chamadas de consulta repetitivas</div>
+              <div class="benefit-item">Menor latência percebida pelo usuário</div>
+              <div class="benefit-item">Aproveita o streaming do provedor de IA</div>
+              <div class="benefit-item">HTTP, sem canal bidirecional complexo</div>
+            </div>
+
+            <p class="sse-direction-note"><strong>Encaixe:</strong> SSE é adequado quando o fluxo predominante é servidor → aplicativo. O app envia novas mensagens ou comandos em requisições HTTP próprias.</p>
+          </div>
+        </section>
+
+        <section class="slide slide-three" id="slide-3" role="group" aria-roledescription="slide" aria-label="Slide 3 de 5. Comparativo técnico." hidden>
+          <header class="slide-heading">
+            <h2>Qual tecnologia faz mais sentido para o nosso cenário?</h2>
+          </header>
+
+          <div class="s3-content">
+            <div class="table-wrap">
+              <table class="compare-table">
+                <caption class="sr-only">Comparação técnica entre Polling, Server-Sent Events e WebSocket</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Critério</th>
+                    <th scope="col">Polling</th>
+                    <th scope="col">SSE</th>
+                    <th scope="col">WebSocket</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Modelo de comunicação</th>
+                    <td data-label="Polling">Requisições repetidas do cliente</td>
+                    <td data-label="SSE">Servidor → cliente, fluxo contínuo</td>
+                    <td data-label="WebSocket">Bidirecional e contínuo</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Requisições e conexões</th>
+                    <td data-label="Polling">Várias chamadas curtas</td>
+                    <td data-label="SSE">Uma resposta HTTP longa por fluxo</td>
+                    <td data-label="WebSocket">Uma conexão persistente duplex</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Latência percebida</th>
+                    <td data-label="Polling">Depende do intervalo de consulta</td>
+                    <td data-label="SSE">Evento enviado quando disponível</td>
+                    <td data-label="WebSocket">Potencialmente baixa, depende do sistema</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Complexidade</th>
+                    <td data-label="Polling">Baixa para fluxos simples</td>
+                    <td data-label="SSE">Média: fluxo e infraestrutura</td>
+                    <td data-label="WebSocket">Maior: protocolo e estado da sessão</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Streaming de IA</th>
+                    <td data-label="Polling">Viável, com consultas recorrentes</td>
+                    <td data-label="SSE">Encaixe direto para tokens e eventos</td>
+                    <td data-label="WebSocket">Viável, pode exceder a necessidade</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Comunicação bidirecional</th>
+                    <td data-label="Polling">Não contínua; cliente envia novas chamadas</td>
+                    <td data-label="SSE">Não; entrada usa HTTP separado</td>
+                    <td data-label="WebSocket">Sim, no mesmo canal</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="conclusion-row" aria-label="Resumo comparativo">
+              <div class="conclusion-item"><strong>Polling</strong><span>Simples, com consultas recorrentes.</span></div>
+              <div class="conclusion-item"><strong>SSE</strong><span>Ideal para entrega contínua predominantemente unidirecional.</span></div>
+              <div class="conclusion-item"><strong>WebSocket</strong><span>Indicado quando há necessidade bidirecional contínua.</span></div>
+            </div>
+
+            <div class="recommendation-band">
+              <strong>Recomendação</strong>
+              <p>Começar com SSE no fluxo de respostas do chat. Manter WebSocket como alternativa se um caso de uso bidirecional justificar sua complexidade.</p>
+            </div>
+            <p class="s3-caveat">Nenhuma opção é universalmente mais eficiente ou escalável. Avaliar padrão de tráfego, concorrência, duração das conexões e limites da infraestrutura.</p>
+          </div>
+        </section>
+
+        <section class="slide slide-four" id="slide-4" role="group" aria-roledescription="slide" aria-label="Slide 4 de 5. Arquitetura proposta." hidden>
+          <header class="slide-heading">
+            <h2>Evoluir a comunicação sem comprometer a arquitetura do SuperApp.</h2>
+          </header>
+
+          <div class="s4-layout">
+            <section class="panel architecture-panel" aria-label="Diagrama da arquitetura proposta">
+              <h3 class="architecture-title">O BFF permanece como fronteira de segurança e integração</h3>
+
+              <div class="architecture-flow" aria-label="Solicitação: React Native para BFF para provedor de IA. Retorno incremental: provedor de IA para BFF para React Native.">
+                <div class="architecture-node">
+                  <span class="architecture-node__type">Aplicativo</span>
+                  <strong>React Native</strong>
+                  <p>Interface do chat e consumo do fluxo de eventos</p>
+                </div>
+                <div class="arch-connector" aria-hidden="true">
+                  <span>solicitação</span>
+                  <span class="arch-connector__arrow">→</span>
+                </div>
+                <div class="architecture-node architecture-node--bff">
+                  <span class="architecture-node__type">Integração segura</span>
+                  <strong>BFF em C# / ASP.NET Core</strong>
+                  <p>Autenticação, autorização, orquestração e encaminhamento</p>
+                  <span class="architecture-node__boundary">Credenciais da IA ficam no servidor</span>
+                </div>
+                <div class="arch-connector" aria-hidden="true">
+                  <span>streaming</span>
+                  <span class="arch-connector__arrow">→</span>
+                </div>
+                <div class="architecture-node">
+                  <span class="architecture-node__type">Geração</span>
+                  <strong>Provedor de IA</strong>
+                  <p>Produz a resposta com suporte a streaming</p>
+                </div>
+              </div>
+
+              <div class="return-flow" aria-label="Retorno incremental: provedor de IA para BFF para React Native">
+                <span class="return-flow__label">Retorno incremental de eventos</span>
+                <div class="return-flow__path">
+                  <span>React Native</span>
+                  <span class="return-flow__arrow" aria-hidden="true">←</span>
+                  <span>BFF</span>
+                  <span class="return-flow__arrow" aria-hidden="true">←</span>
+                  <span>Provedor de IA</span>
+                </div>
+              </div>
+
+              <div class="event-area">
+                <span class="event-area__label">Exemplos de eventos</span>
+                <div class="event-list" aria-label="message.started, token, tool.started, tool.completed, message.completed e message.error">
+                  <span class="event-chip">message.started</span>
+                  <span class="event-chip">token</span>
+                  <span class="event-chip">tool.started</span>
+                  <span class="event-chip">tool.completed</span>
+                  <span class="event-chip">message.completed</span>
+                  <span class="event-chip">message.error</span>
+                </div>
+              </div>
+
+              <div class="azure-foundation">
+                <strong>Infraestrutura Azure</strong>
+                <span>Hospedagem · segurança · observabilidade · gerenciamento das conexões</span>
+              </div>
+            </section>
+
+            <aside class="panel implementation-panel">
+              <h3>Pontos de implementação</h3>
+              <ul class="implementation-list">
+                <li>Encaminhar eventos incrementalmente e fazer flush durante a transmissão.</li>
+                <li>Propagar o cancelamento quando a pessoa interromper a geração.</li>
+                <li>Tratar desconexões e erros sem perder o estado da conversa.</li>
+                <li>Verificar buffering e timeouts no Azure, APIM e demais componentes intermediários.</li>
+                <li>Definir reconexão compatível com o contrato e com o ciclo de vida do app.</li>
+                <li>Preservar persistência e ordenação das mensagens na aplicação. SSE é transporte.</li>
+              </ul>
+              <p class="platform-note">Validar consumo incremental nas versões de React Native, iOS e Android utilizadas pelo SuperApp.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section class="slide slide-five" id="slide-5" role="group" aria-roledescription="slide" aria-label="Slide 5 de 5. Benefícios, riscos e adoção." hidden>
+          <header class="slide-heading">
+            <h2>Uma evolução técnica mensurável, com riscos controlados.</h2>
+          </header>
+
+          <div class="s5-content">
+            <div class="s5-grid">
+              <section class="s5-panel" aria-label="Benefícios esperados">
+                <h3>Benefícios esperados</h3>
+                <p class="expected-label">Hipóteses a validar, não resultados comprovados.</p>
+                <ul class="plain-list">
+                  <li>Melhor experiência de conversação.</li>
+                  <li>Menor atraso na apresentação das respostas.</li>
+                  <li>Redução das consultas periódicas.</li>
+                  <li>Comunicação alinhada ao streaming dos provedores de IA.</li>
+                  <li>Melhor aproveitamento do fluxo de dados.</li>
+                </ul>
+              </section>
+
+              <section class="s5-panel s5-panel--risk" aria-label="Pontos de atenção">
+                <h3>Pontos de atenção</h3>
+                <ul class="plain-list">
+                  <li>Conexões HTTP de longa duração.</li>
+                  <li>Timeouts e buffering na infraestrutura.</li>
+                  <li>Reconexão e tratamento de desconexões.</li>
+                  <li>Cancelamento das gerações.</li>
+                  <li>Memória e conexões concorrentes.</li>
+                  <li>Persistência e ordenação das mensagens.</li>
+                </ul>
+              </section>
+
+              <section class="s5-panel s5-panel--plan" aria-label="Plano de adoção">
+                <h3>Plano de adoção</h3>
+                <ol class="plan-list">
+                  <li><span class="plan-list__number">1</span><span><strong>Prova de conceito:</strong> implementar SSE no fluxo do chat.</span></li>
+                  <li><span class="plan-list__number">2</span><span><strong>Compatibilidade mobile:</strong> validar consumo incremental em React Native, iOS e Android.</span></li>
+                  <li><span class="plan-list__number">3</span><span><strong>Infraestrutura:</strong> testar Azure, APIM, flush, buffering e timeouts.</span></li>
+                  <li><span class="plan-list__number">4</span><span><strong>Comparação:</strong> testar polling e SSE sob condições equivalentes de carga.</span></li>
+                  <li><span class="plan-list__number">5</span><span><strong>Medição:</strong> primeiro token, duração, requisições, conexões simultâneas, erros e recursos.</span></li>
+                </ol>
+              </section>
+            </div>
+
+            <div class="closing-band">
+              <strong>Menos consultas. Respostas mais rápidas. Uma experiência de IA mais natural.</strong>
+              <p>Iniciar com um piloto controlado, validar os resultados e evoluir para produção com métricas objetivas.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="control-row" aria-label="Controles da apresentação">
+      <button class="control-button" id="previousButton" type="button" aria-label="Ir para o slide anterior">
+        <span aria-hidden="true">←</span><span class="control-text">Anterior</span>
+      </button>
+      <nav class="progress-nav" id="progressNav" aria-label="Progresso e navegação entre slides">
+        <button class="progress-step" type="button" data-slide-index="0" aria-label="Ir para o slide 1: O problema do polling"></button>
+        <button class="progress-step" type="button" data-slide-index="1" aria-label="Ir para o slide 2: Streaming com SSE"></button>
+        <button class="progress-step" type="button" data-slide-index="2" aria-label="Ir para o slide 3: Comparativo técnico"></button>
+        <button class="progress-step" type="button" data-slide-index="3" aria-label="Ir para o slide 4: Arquitetura proposta"></button>
+        <button class="progress-step" type="button" data-slide-index="4" aria-label="Ir para o slide 5: Benefícios, riscos e adoção"></button>
+      </nav>
+      <div class="control-right">
+        <span class="slide-counter" id="slideCounter" aria-live="polite">01 / 05</span>
+        <button class="control-button control-button--fullscreen" id="fullscreenButton" type="button" aria-label="Ativar tela cheia" title="Tela cheia">
+          <span aria-hidden="true">⛶</span>
+        </button>
+        <button class="control-button control-button--next" id="nextButton" type="button" aria-label="Ir para o próximo slide">
+          <span class="control-text">Próximo</span><span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+    <p class="sr-only" id="slideAnnouncement" aria-live="polite" aria-atomic="true"></p>
+  </div>
+
+  <script>
+    // Navegação local do deck: teclado, botões, progresso, URL e tela cheia.
+    (function () {
+      'use strict';
+
+      var app = document.getElementById('deckApp');
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var progressButtons = Array.prototype.slice.call(document.querySelectorAll('[data-slide-index]'));
+      var previousButton = document.getElementById('previousButton');
+      var nextButton = document.getElementById('nextButton');
+      var fullscreenButton = document.getElementById('fullscreenButton');
+      var slideCounter = document.getElementById('slideCounter');
+      var slideAnnouncement = document.getElementById('slideAnnouncement');
+      var currentIndex = 0;
+
+      function getRequestedIndex() {
+        try {
+          var value = new URLSearchParams(window.location.search).get('slide');
+          if (!value || !/^\d+$/.test(value)) return 0;
+          var requested = Number(value) - 1;
+          return requested >= 0 && requested < slides.length ? requested : 0;
+        } catch (error) {
+          return 0;
+        }
+      }
+
+      function syncUrl(replace) {
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.set('slide', String(currentIndex + 1));
+          var state = { slide: currentIndex };
+          if (replace) {
+            window.history.replaceState(state, '', url.href);
+          } else {
+            window.history.pushState(state, '', url.href);
+          }
+        } catch (error) {
+          // Navegação do deck continua funcional em contextos que bloqueiam o histórico.
+        }
+      }
+
+      function render() {
+        slides.forEach(function (slide, index) {
+          var isActive = index === currentIndex;
+          slide.hidden = !isActive;
+          slide.classList.toggle('is-active', isActive);
+          slide.setAttribute('aria-hidden', String(!isActive));
+        });
+
+        progressButtons.forEach(function (button, index) {
+          var isCurrent = index === currentIndex;
+          button.classList.toggle('is-current', isCurrent);
+          button.classList.toggle('is-complete', index < currentIndex);
+          if (isCurrent) {
+            button.setAttribute('aria-current', 'step');
+          } else {
+            button.removeAttribute('aria-current');
+          }
+        });
+
+        previousButton.disabled = currentIndex === 0;
+        nextButton.disabled = currentIndex === slides.length - 1;
+        slideCounter.textContent = String(currentIndex + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+        slideAnnouncement.textContent = 'Slide ' + (currentIndex + 1) + ' de ' + slides.length + '. ' + slides[currentIndex].getAttribute('aria-label').replace(/^Slide \d+ de \d+\. /, '');
+      }
+
+      function goTo(index, shouldPushHistory) {
+        if (index < 0 || index >= slides.length || index === currentIndex) return;
+        currentIndex = index;
+        render();
+        syncUrl(!shouldPushHistory);
+      }
+
+      function isEditableTarget(target) {
+        return target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+      }
+
+      previousButton.addEventListener('click', function () {
+        goTo(currentIndex - 1, true);
+      });
+
+      nextButton.addEventListener('click', function () {
+        goTo(currentIndex + 1, true);
+      });
+
+      progressButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          goTo(Number(button.getAttribute('data-slide-index')), true);
+        });
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.altKey || event.ctrlKey || event.metaKey || isEditableTarget(event.target)) return;
+        if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          goTo(currentIndex + 1, true);
+        } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          goTo(currentIndex - 1, true);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          goTo(0, true);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          goTo(slides.length - 1, true);
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          toggleFullscreen();
+        }
+      });
+
+      function updateFullscreenLabel() {
+        var isFullscreen = document.fullscreenElement === app;
+        fullscreenButton.setAttribute('aria-label', isFullscreen ? 'Sair da tela cheia' : 'Ativar tela cheia');
+        fullscreenButton.title = isFullscreen ? 'Sair da tela cheia' : 'Tela cheia';
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(function () {});
+          }
+          return;
+        }
+        if (app.requestFullscreen) {
+          app.requestFullscreen().catch(function () {
+            slideAnnouncement.textContent = 'Não foi possível ativar a tela cheia neste navegador.';
+          });
+        } else {
+          slideAnnouncement.textContent = 'A tela cheia não é suportada neste navegador.';
+        }
+      }
+
+      fullscreenButton.addEventListener('click', toggleFullscreen);
+      document.addEventListener('fullscreenchange', updateFullscreenLabel);
+      window.addEventListener('popstate', function () {
+        currentIndex = getRequestedIndex();
+        render();
+      });
+
+      currentIndex = getRequestedIndex();
+      render();
+      syncUrl(true);
+    })();
+  </script>
+</body>
+</html>

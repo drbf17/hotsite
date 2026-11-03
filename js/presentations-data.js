@@ -16,6 +16,12 @@ window.PRESENTATIONS = [
     title: 'Agentic-First SDLC',
     description: 'Fundamentos de engenharia na era dos agentes de IA: validações determinísticas, módulos profundos e o ponto ideal de granularidade multiagente.',
     href: 'presentations/agentic-first-sdlc/index.html'
+  },
+  {
+    slug: 'streaming-chat-ia',
+    title: 'Streaming no chat de IA',
+    description: 'Proposta para evoluir o chat de IA do SuperApp de polling para streaming HTTP com Server-Sent Events.',
+    href: 'presentations/streaming-chat-ia/index.html'
   }
 
   // Para adicionar uma nova apresentação:
