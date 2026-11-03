@@ -22,6 +22,12 @@ window.PRESENTATIONS = [
     title: 'Streaming no chat de IA',
     description: 'Proposta para evoluir o chat de IA do SuperApp de polling para streaming HTTP com Server-Sent Events.',
     href: 'presentations/streaming-chat-ia/index.html'
+  },
+  {
+    slug: 'upload-seguro-arquivos',
+    title: 'Upload Seguro de Arquivos',
+    description: 'Proposta de arquitetura para upload centralizado, direto ao Azure Blob Storage e protegido por User Delegation SAS.',
+    href: 'presentations/upload-seguro-arquivos/index.html'
   }
 
   // Para adicionar uma nova apresentação:

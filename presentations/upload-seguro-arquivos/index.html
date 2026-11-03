@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f9fc">
+  <meta name="description" content="Proposta de arquitetura para upload seguro e centralizado de arquivos no Super App com Microsoft Azure.">
+  <title>Upload Seguro de Arquivos no Super App | Proposta de Arquitetura</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #102a43;
+      --navy-2: #173f65;
+      --azure: #0078d4;
+      --azure-strong: #0067b8;
+      --orange: #e27a18;
+      --green: #18794e;
+      --green-soft: #edf7f0;
+      --ink: #172b3f;
+      --muted: #536b80;
+      --line: #d7e2ec;
+      --pale: #f3f8fc;
+      --paper: #fbfdff;
+      --white: #fff;
+      --radius: 14px;
+      --shadow: 0 18px 50px rgba(16, 42, 67, 0.08);
+      font-family: "Segoe UI Variable", "Segoe UI", Aptos, system-ui, -apple-system, sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { display: grid; place-items: center; overflow: hidden; background: #eaf0f6; color: var(--ink); }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid rgba(0, 120, 212, 0.4); outline-offset: 3px; }
+    .deck {
+      position: relative;
+      width: min(100vw, 177.7778dvh);
+      height: min(100dvh, 56.25vw);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: var(--paper);
+      isolation: isolate;
+    }
+    .slides { position: absolute; inset: 0; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      padding: clamp(32px, 5.2vh, 66px) clamp(28px, 6.1vw, 112px) clamp(86px, 9vh, 104px);
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(0, 120, 212, 0.035), transparent 34%),
+        linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+    }
+    .slide.is-active { display: flex; animation: slide-in 240ms ease-out both; }
+    @keyframes slide-in { from { opacity: 0.55; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+    .slide-header { flex: 0 0 auto; margin: 0 0 clamp(16px, 2.2vh, 26px); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 12px;
+      color: var(--azure-strong);
+      font-size: clamp(10px, 0.85vw, 12px);
+      font-weight: 750;
+      letter-spacing: 0.105em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { width: 19px; height: 2px; content: ""; background: var(--orange); }
+    h1 {
+      max-width: 1120px;
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(32px, 3.25vw, 52px);
+      font-weight: 680;
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+    .subtitle {
+      max-width: 960px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.28vw, 20px);
+      line-height: 1.4;
+    }
+    .section-title {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(19px, 1.65vw, 26px);
+      font-weight: 650;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+    .slide-kicker {
+      margin: 0 0 9px;
+      color: var(--azure-strong);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Slide 1: why a platform capability is needed */
+    .s1-layout {
+      display: grid;
+      flex: 1 1 auto;
+      min-height: 0;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(24px, 4vw, 62px);
+      align-items: stretch;
+    }
+    .problem-panel { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .problem-panel .section-title { max-width: 580px; margin-bottom: clamp(16px, 2.3vh, 26px); }
+    .problem-list { display: grid; gap: clamp(10px, 1.4vh, 16px); margin: 0; padding: 0; list-style: none; }
+    .problem-list li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; color: #355069; font-size: clamp(14px, 1.15vw, 17px); line-height: 1.38; }
+    .problem-list li::before { width: 7px; height: 7px; margin: 7px 0 0 5px; border-radius: 2px; content: ""; background: var(--orange); transform: rotate(45deg); }
+    .decision-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      min-width: 0;
+      padding: clamp(18px, 2.5vw, 32px);
+      border: 1px solid #dfe8f0;
+      border-radius: var(--radius);
+      background: rgba(243, 248, 252, 0.84);
+    }
+    .decision-panel__head { margin-bottom: 2px; }
+    .decision-panel__head h2 { margin: 0; color: var(--navy); font-size: clamp(19px, 1.6vw, 24px); letter-spacing: -0.025em; }
+    .decision-panel__head p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .choice {
+      display: grid;
+      grid-template-columns: 31px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 70px;
+      padding: 12px 14px;
+      border: 1px solid #d9e3eb;
+      border-radius: 10px;
+      background: var(--white);
+    }
+    .choice__index { color: #71879a; font-size: 12px; font-weight: 750; }
+    .choice h3 { margin: 0; color: var(--navy); font-size: clamp(14px, 1.15vw, 17px); font-weight: 700; }
+    .choice p { margin: 4px 0 0; color: var(--muted); font-size: clamp(11px, 0.92vw, 13px); line-height: 1.35; }
+    .choice__badge { white-space: nowrap; padding: 6px 8px; border-radius: 6px; background: #f7f0e9; color: #8a4c13; font-size: 10px; font-weight: 750; }
+    .choice--viable .choice__badge { background: #edf4fa; color: #315d82; }
+    .choice--recommended { border-color: #9dc8ac; background: var(--green-soft); box-shadow: inset 3px 0 0 var(--green); }
+    .choice--recommended .choice__badge { background: #dcefe2; color: #17613e; }
+    .decision-statement {
+      display: grid;
+      flex: 0 0 auto;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      margin-top: clamp(15px, 2vh, 22px);
+      padding: 16px 20px;
+      border-left: 4px solid var(--azure);
+      background: #edf5fb;
+    }
+    .statement-label { color: var(--azure-strong); font-size: 11px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+    .decision-statement strong { color: var(--navy); font-size: clamp(16px, 1.4vw, 21px); font-weight: 650; line-height: 1.25; }
+
+    /* Slide 2: comparable criteria with an explicit recommendation */
+    .comparison-wrap { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column; }
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 8px 24px rgba(16, 42, 67, 0.045);
+    }
+    .comparison-table th, .comparison-table td { text-align: left; vertical-align: middle; }
+    .comparison-table thead th { height: 55px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: #f4f8fb; color: var(--navy); font-size: clamp(12px, 1vw, 15px); font-weight: 750; }
+    .comparison-table thead th:first-child { width: 21%; color: #5b7184; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; }
+    .comparison-table thead th:not(:first-child) { width: 26.333%; }
+    .comparison-table thead th.recommended-col { background: #e8f4ec; color: #155e3c; box-shadow: inset 0 3px 0 var(--green); }
+    .column-tag { display: block; margin-top: 3px; color: #71879a; font-size: 10px; font-weight: 650; }
+    .recommended-col .column-tag { color: #26734d; }
+    .comparison-table tbody th, .comparison-table tbody td { height: 41px; padding: 8px 14px; border-bottom: 1px solid #e8eef3; color: #415b72; font-size: clamp(12px, 1vw, 15px); line-height: 1.25; }
+    .comparison-table tbody th { color: #263f56; font-weight: 650; }
+    .comparison-table tbody td.recommended-col { background: #f4faf6; color: #244f39; font-weight: 650; }
+    .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom: 0; }
+    .comparison-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin-top: 13px; color: #526a7f; font-size: clamp(11px, 0.93vw, 13px); line-height: 1.35; }
+    .comparison-notes p { margin: 0; }
+    .comparison-notes strong { color: var(--navy); font-weight: 700; }
+
+    /* Slide 3: architecture diagram */
+    .slide--architecture { padding-top: clamp(28px, 4.3vh, 54px); }
+    .slide--architecture .slide-header { margin-bottom: 11px; }
+    .architecture-callout {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 9px;
+      color: var(--navy);
+      font-size: clamp(15px, 1.22vw, 19px);
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .architecture-callout::before { width: 4px; height: 23px; flex: 0 0 auto; content: ""; border-radius: 2px; background: var(--azure); }
+    .architecture-figure { flex: 1 1 auto; min-height: 0; margin: 0; }
+    .architecture-svg { display: block; width: 100%; height: 100%; }
+    .diagram-note {
+      flex: 0 0 auto;
+      margin: 6px 0 0;
+      color: #536b80;
+      font-size: clamp(11px, 0.9vw, 13px);
+      line-height: 1.3;
+    }
+    .diagram-note strong { color: var(--navy); }
+    .mobile-architecture { display: none; }
+
+    /* Slide 4: decision rationale */
+    .benefits-grid {
+      display: grid;
+      flex: 1 1 auto;
+      min-height: 0;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: clamp(13px, 2vw, 25px);
+    }
+    .benefit {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 15px;
+      min-width: 0;
+      padding: clamp(17px, 2.1vw, 27px);
+      border: 1px solid #dfe8f0;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.82);
+    }
+    .benefit__number { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 9px; background: #eaf3fa; color: var(--azure-strong); font-size: 12px; font-weight: 800; }
+    .benefit h2 { margin: 1px 0 10px; color: var(--navy); font-size: clamp(17px, 1.45vw, 22px); font-weight: 700; letter-spacing: -0.025em; }
+    .benefit ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+    .benefit li { position: relative; padding-left: 15px; color: #50687d; font-size: clamp(12px, 1.02vw, 15px); line-height: 1.34; }
+    .benefit li::before { position: absolute; top: 0.56em; left: 0; width: 5px; height: 5px; border-radius: 1px; content: ""; background: var(--azure); }
+    .architectural-statement {
+      display: grid;
+      flex: 0 0 auto;
+      grid-template-columns: 4px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      margin-top: clamp(14px, 1.9vh, 22px);
+      padding: 16px 20px;
+      border-radius: 10px;
+      background: var(--navy);
+      color: var(--white);
+    }
+    .architectural-statement::before { width: 4px; height: 28px; content: ""; background: #f29a38; }
+    .architectural-statement strong { font-size: clamp(15px, 1.35vw, 20px); font-weight: 650; line-height: 1.25; }
+    .architectural-statement span { color: #c4d6e5; font-size: 11px; white-space: nowrap; }
+
+    /* Slide 5: decision and roadmap */
+    .s5-layout { display: grid; flex: 1 1 auto; min-height: 0; grid-template-columns: 1.08fr 0.92fr; gap: clamp(24px, 4vw, 62px); }
+    .decision-list-panel, .roadmap-panel { min-width: 0; }
+    .decision-list-panel h2, .roadmap-panel h2 { margin: 0 0 16px; color: var(--navy); font-size: clamp(18px, 1.5vw, 23px); letter-spacing: -0.02em; }
+    .leadership-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: decision; }
+    .leadership-list li { display: grid; grid-template-columns: 27px 1fr; gap: 10px; align-items: start; color: #435d73; font-size: clamp(13px, 1.02vw, 15px); line-height: 1.35; counter-increment: decision; }
+    .leadership-list li::before { display: grid; width: 25px; height: 25px; place-items: center; border: 1px solid #c9d8e5; border-radius: 50%; content: counter(decision); color: var(--azure-strong); font-size: 11px; font-weight: 750; }
+    .leadership-list strong { color: var(--navy); font-weight: 700; }
+    .roadmap-list { position: relative; display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .roadmap-list::before { position: absolute; top: 14px; bottom: 14px; left: 14px; width: 1px; content: ""; background: #b6cbdc; }
+    .roadmap-step { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; min-height: 58px; }
+    .roadmap-step__marker { z-index: 1; display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid #9db9cf; border-radius: 50%; background: #f6fafe; color: var(--azure-strong); font-size: 10px; font-weight: 800; }
+    .roadmap-step h3 { margin: 1px 0 3px; color: var(--navy); font-size: clamp(13px, 1.02vw, 15px); font-weight: 700; }
+    .roadmap-step p { margin: 0; color: #5a7185; font-size: clamp(11px, 0.9vw, 13px); line-height: 1.3; }
+    .closing-statement {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      margin-top: clamp(12px, 1.8vh, 20px);
+      padding: clamp(13px, 1.5vw, 19px) clamp(17px, 2vw, 26px);
+      border-left: 4px solid #f29a38;
+      border-radius: 0 10px 10px 0;
+      background: #eef4f9;
+      color: var(--navy);
+      font-size: clamp(15px, 1.22vw, 18px);
+      font-weight: 650;
+      line-height: 1.34;
+    }
+
+    /* Persistent navigation, progress, and slide count */
+    .progress-track { position: absolute; z-index: 10; inset: 0 0 auto; height: 4px; background: #e4edf4; }
+    .progress-bar { width: 20%; height: 100%; background: var(--azure); transition: width 220ms ease; }
+    .chrome {
+      position: absolute;
+      z-index: 10;
+      right: clamp(15px, 3.2vw, 48px);
+      bottom: clamp(14px, 2.2vh, 24px);
+      left: clamp(15px, 3.2vw, 48px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      pointer-events: none;
+    }
+    .chrome__identity, .chrome__controls { display: flex; align-items: center; pointer-events: auto; }
+    .chrome__identity { gap: 14px; color: #567087; font-size: 10px; font-weight: 750; letter-spacing: 0.08em; }
+    .chrome__identity::before { width: 23px; height: 3px; content: ""; background: var(--azure); }
+    .slide-count { color: var(--navy); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+    .slide-count strong { font-weight: 800; }
+    .chrome__controls { gap: 7px; padding: 5px; border: 1px solid #dbe5ed; border-radius: 11px; background: rgba(255, 255, 255, 0.96); box-shadow: 0 6px 20px rgba(16, 42, 67, 0.08); }
+    .control-button, .nav-dot {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+    }
+    .control-button { width: 34px; height: 34px; font-size: 18px; line-height: 1; }
+    .control-button:hover, .nav-dot:hover { background: #eaf3fa; color: var(--azure-strong); }
+    .control-button:active, .nav-dot:active { transform: scale(0.96); }
+    .nav-dots { display: flex; align-items: center; gap: 3px; padding: 0 3px; }
+    .nav-dot { width: 24px; height: 30px; position: relative; }
+    .nav-dot::after { width: 6px; height: 6px; border-radius: 50%; content: ""; background: #adc0d0; transition: width 150ms ease, border-radius 150ms ease, background 150ms ease; }
+    .nav-dot[aria-current="step"]::after { width: 15px; border-radius: 5px; background: var(--azure); }
+    .control-divider { width: 1px; height: 22px; margin: 0 2px; background: #dce5ec; }
+    .control-button--utility { color: #526a80; font-size: 15px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+
+    @media (max-width: 900px) {
+      .slide { padding-right: 5vw; padding-left: 5vw; }
+      .s1-layout, .s5-layout { gap: 20px; }
+      .comparison-table thead th, .comparison-table tbody th, .comparison-table tbody td { padding-right: 9px; padding-left: 9px; }
+      .benefit { gap: 10px; padding: 17px; grid-template-columns: 34px 1fr; }
+      .benefit__number { width: 32px; height: 32px; }
+    }
+    @media (min-width: 701px) and (max-width: 1244px), (min-width: 701px) and (max-height: 700px) {
+      .slide { padding-top: 22px; padding-bottom: 68px; }
+      .slide-header { margin-bottom: 12px; }
+      h1 { font-size: clamp(29px, 2.8vw, 40px); }
+      .subtitle { font-size: clamp(13px, 1.1vw, 17px); }
+      .comparison-table thead th { height: 43px; padding: 7px 9px; font-size: 12px; }
+      .comparison-table tbody th, .comparison-table tbody td { height: 31px; padding: 5px 9px; font-size: clamp(10px, 0.82vw, 12px); }
+      .comparison-notes { gap: 5px 18px; margin-top: 8px; font-size: 10px; line-height: 1.25; }
+    }
+    @media (max-width: 700px) {
+      .deck { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; }
+      .slide { padding: 27px 18px 77px; }
+      .slide-header { margin-bottom: 13px; }
+      .eyebrow { margin-bottom: 9px; font-size: 9px; }
+      h1 { font-size: clamp(27px, 7.7vw, 36px); }
+      .subtitle { margin-top: 7px; font-size: 13px; }
+      .section-title { font-size: 17px; }
+      .s1-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 12px; }
+      .problem-panel { justify-content: flex-start; }
+      .problem-panel .section-title { margin-bottom: 10px; }
+      .problem-list { grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+      .problem-list li { grid-template-columns: 14px 1fr; gap: 5px; font-size: 10.5px; line-height: 1.25; }
+      .problem-list li::before { width: 5px; height: 5px; margin: 4px 0 0 3px; }
+      .decision-panel { gap: 6px; padding: 10px; }
+      .decision-panel__head h2 { font-size: 14px; }
+      .decision-panel__head p { margin-top: 3px; font-size: 10px; }
+      .choice { grid-template-columns: 19px minmax(0,1fr) auto; gap: 6px; min-height: 48px; padding: 6px 7px; }
+      .choice__index { font-size: 9px; }
+      .choice h3 { font-size: 11px; }
+      .choice p { margin-top: 2px; font-size: 9px; }
+      .choice__badge { padding: 4px 5px; font-size: 8px; }
+      .decision-statement { grid-template-columns: 1fr; gap: 4px; margin-top: 10px; padding: 10px 12px; }
+      .statement-label { font-size: 8px; }
+      .decision-statement strong { font-size: 12px; }
+      .comparison-wrap { overflow: hidden; }
+      .comparison-table { border-radius: 8px; }
+      .comparison-table thead th { height: 42px; padding: 5px 3px; font-size: 9px; line-height: 1.15; }
+      .comparison-table thead th:first-child { width: 23%; font-size: 8px; }
+      .comparison-table thead th:not(:first-child) { width: 25.666%; }
+      .column-tag { margin-top: 2px; font-size: 7px; }
+      .comparison-table tbody th, .comparison-table tbody td { height: 31px; padding: 4px 3px; font-size: 8.5px; line-height: 1.13; overflow-wrap: anywhere; }
+      .comparison-notes { grid-template-columns: 1fr; gap: 5px; margin-top: 8px; font-size: 9px; line-height: 1.25; }
+      .slide--architecture { padding-top: 24px; }
+      .slide--architecture .slide-header { margin-bottom: 8px; }
+      .architecture-callout { margin-bottom: 8px; font-size: 12px; }
+      .architecture-callout::before { height: 18px; }
+      .architecture-svg { display: none; }
+      .architecture-figure { display: flex; flex-direction: column; justify-content: center; }
+      .mobile-architecture { display: grid; gap: 8px; }
+      .mobile-flow { padding: 9px 10px; border: 1px solid #d7e2ec; border-left: 3px solid var(--azure); border-radius: 8px; background: #fff; }
+      .mobile-flow--security { border-left-color: var(--green); }
+      .mobile-flow h2 { margin: 0 0 4px; color: #537087; font-size: 8px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+      .mobile-flow p { margin: 0; color: var(--navy); font-size: 10.5px; font-weight: 650; line-height: 1.3; }
+      .mobile-flow small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.28; }
+      .diagram-note { margin-top: 6px; font-size: 9px; }
+      .benefits-grid { gap: 8px; }
+      .benefit { grid-template-columns: 23px 1fr; gap: 7px; padding: 10px 8px; border-radius: 9px; }
+      .benefit__number { width: 22px; height: 22px; border-radius: 6px; font-size: 8px; }
+      .benefit h2 { margin: 0 0 6px; font-size: 11px; }
+      .benefit ul { gap: 4px; }
+      .benefit li { padding-left: 8px; font-size: 8.5px; line-height: 1.2; }
+      .benefit li::before { width: 3px; height: 3px; }
+      .architectural-statement { grid-template-columns: 3px 1fr; gap: 8px; margin-top: 9px; padding: 9px 10px; }
+      .architectural-statement::before { width: 3px; height: 25px; }
+      .architectural-statement strong { font-size: 11px; }
+      .architectural-statement span { display: none; }
+      .s5-layout { grid-template-columns: 1.05fr 0.95fr; gap: 12px; }
+      .decision-list-panel h2, .roadmap-panel h2 { margin-bottom: 8px; font-size: 13px; }
+      .leadership-list { gap: 6px; }
+      .leadership-list li { grid-template-columns: 19px 1fr; gap: 5px; font-size: 9px; line-height: 1.2; }
+      .leadership-list li::before { width: 18px; height: 18px; font-size: 8px; }
+      .roadmap-list { gap: 5px; }
+      .roadmap-list::before { top: 9px; bottom: 9px; left: 9px; }
+      .roadmap-step { grid-template-columns: 20px 1fr; gap: 6px; min-height: 48px; }
+      .roadmap-step__marker { width: 19px; height: 19px; font-size: 7px; }
+      .roadmap-step h3 { margin: 0 0 2px; font-size: 9px; line-height: 1.2; }
+      .roadmap-step p { font-size: 8px; line-height: 1.2; }
+      .closing-statement { margin-top: 8px; padding: 9px 10px; font-size: 10px; line-height: 1.25; }
+      .chrome { right: 12px; bottom: 11px; left: 12px; min-height: 38px; }
+      .chrome__identity { gap: 8px; font-size: 8px; }
+      .chrome__identity::before { width: 15px; }
+      .chrome__controls { gap: 2px; padding: 3px; }
+      .control-button { width: 27px; height: 29px; font-size: 15px; }
+      .nav-dots { gap: 0; padding: 0; }
+      .nav-dot { width: 18px; height: 27px; }
+      .nav-dot::after { width: 5px; height: 5px; }
+      .nav-dot[aria-current="step"]::after { width: 12px; }
+      .control-divider { height: 18px; margin: 0 1px; }
+      .control-button--utility { font-size: 12px; }
+    }
+    @media (max-width: 380px) {
+      .chrome__identity { font-size: 0; }
+      .chrome__identity::before { width: 10px; }
+      .problem-list li { font-size: 9px; }
+      .choice p { font-size: 8px; }
+      .comparison-table tbody th, .comparison-table tbody td { font-size: 7.8px; }
+      .comparison-notes { font-size: 8px; }
+      .benefit li { font-size: 7.8px; }
+      .leadership-list li { font-size: 8px; }
+      .roadmap-step h3 { font-size: 8px; }
+      .roadmap-step p { font-size: 7px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+    @media print {
+      @page { size: 16in 9in; margin: 0; }
+      html, body { display: block; width: 16in; height: auto; overflow: visible; background: #fff; }
+      .deck { width: 16in; height: auto; aspect-ratio: auto; overflow: visible; background: #fff; }
+      .slides { position: static; display: block; }
+      .slide, .slide.is-active {
+        position: relative;
+        inset: auto;
+        display: flex !important;
+        width: 16in;
+        height: 9in;
+        min-height: 9in;
+        max-height: 9in;
+        padding: 0.52in 0.72in 0.58in;
+        overflow: hidden;
+        animation: none !important;
+        break-after: page;
+        page-break-after: always;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      .slide:last-child { break-after: auto; page-break-after: auto; }
+      .progress-track, .chrome { display: none !important; }
+      .architecture-svg { display: block !important; width: 100%; height: 5.35in; }
+      .mobile-architecture { display: none !important; }
+      .comparison-table { box-shadow: none; }
+      .decision-panel, .benefit { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <div class="progress-track" role="progressbar" aria-label="Progresso da apresentação" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <main class="slides" id="slides" aria-label="Apresentação: Upload Seguro de Arquivos no Super App">
+      <section class="slide slide--opening is-active" id="slide-1" data-slide="0" aria-labelledby="title-1" aria-hidden="false">
+        <header class="slide-header">
+          <p class="eyebrow">Proposta de arquitetura · Super App</p>
+          <h1 id="title-1">Upload Seguro de Arquivos no Super App</h1>
+          <p class="subtitle">Uma capacidade compartilhada, escalável e segura sobre Microsoft Azure.</p>
+        </header>
+
+        <div class="s1-layout">
+          <section class="problem-panel" aria-labelledby="problem-title">
+            <p class="slide-kicker">O cenário atual</p>
+            <h2 class="section-title" id="problem-title">O upload não deve ser reinventado por cada mini-app.</h2>
+            <ul class="problem-list">
+              <li>Várias mini-apps precisam enviar arquivos para fluxos de negócio.</li>
+              <li>Implementações duplicadas ampliam a manutenção e criam inconsistências de segurança.</li>
+              <li>Trafegar binários pelo BFF consome banda e capacidade do backend.</li>
+              <li>Arquivos recebidos precisam de validação centralizada antes do uso pelo negócio.</li>
+            </ul>
+          </section>
+
+          <section class="decision-panel" aria-labelledby="decision-question">
+            <div class="decision-panel__head">
+              <p class="slide-kicker">A decisão arquitetural</p>
+              <h2 id="decision-question">Onde trafega o binário?</h2>
+              <p>A autorização continua centralizada; o fluxo do arquivo pode mudar.</p>
+            </div>
+            <article class="choice">
+              <span class="choice__index" aria-hidden="true">01</span>
+              <div><h3>Base64 via BFF</h3><p>Codifica o payload e mantém o binário no backend.</p></div>
+              <span class="choice__badge">Não recomendado</span>
+            </article>
+            <article class="choice choice--viable">
+              <span class="choice__index" aria-hidden="true">02</span>
+              <div><h3>Multipart via BFF</h3><p>Streaming controla memória, mas o BFF segue no caminho.</p></div>
+              <span class="choice__badge">Viável</span>
+            </article>
+            <article class="choice choice--recommended">
+              <span class="choice__index" aria-hidden="true">03</span>
+              <div><h3>Direct Blob + SAS</h3><p>Upload HTTPS direto para o Blob, com autorização curta.</p></div>
+              <span class="choice__badge">Recomendado</span>
+            </article>
+          </section>
+        </div>
+
+        <div class="decision-statement">
+          <span class="statement-label">Direção proposta</span>
+          <strong>Transformar o upload de arquivos em uma capacidade nativa da plataforma Super App.</strong>
+        </div>
+      </section>
+
+      <section class="slide slide--comparison" id="slide-2" data-slide="1" aria-labelledby="title-2" aria-hidden="true">
+        <header class="slide-header">
+          <p class="eyebrow">Comparação arquitetural</p>
+          <h1 id="title-2">Três alternativas. Diferentes impactos arquiteturais.</h1>
+          <p class="subtitle">O ponto decisivo é o caminho do binário, sem abrir mão de autorização e governança centralizadas.</p>
+        </header>
+
+        <div class="comparison-wrap">
+          <table class="comparison-table" aria-label="Comparação de alternativas de upload">
+            <thead>
+              <tr>
+                <th scope="col">Critério</th>
+                <th scope="col">Base64 + BFF<span class="column-tag">Não recomendado</span></th>
+                <th scope="col">Multipart + BFF<span class="column-tag">Alternativa viável</span></th>
+                <th scope="col" class="recommended-col">Direct Blob + SAS<span class="column-tag">Recomendado</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Transferência binária</th><td>Codificada</td><td>Binária</td><td class="recommended-col">Binária</td></tr>
+              <tr><th scope="row">Overhead de payload</th><td>≈ +33%</td><td>Mínimo</td><td class="recommended-col">Mínimo</td></tr>
+              <tr><th scope="row">Tráfego no BFF</th><td>Alto</td><td>Alto</td><td class="recommended-col">Muito baixo, sem binário</td></tr>
+              <tr><th scope="row">Pressão de memória</th><td>Potencialmente alta</td><td>Controlável com streaming</td><td class="recommended-col">Baixa no BFF</td></tr>
+              <tr><th scope="row">Escalabilidade do fluxo</th><td>Limitada pelo BFF</td><td>Depende do BFF e streaming</td><td class="recommended-col">Alta no plano binário</td></tr>
+              <tr><th scope="row">Complexidade mobile</th><td>Baixa</td><td>Média</td><td class="recommended-col">Média, com SDK comum</td></tr>
+              <tr><th scope="row">Integração Azure</th><td>Via backend</td><td>Via backend</td><td class="recommended-col">Direta, com SAS</td></tr>
+              <tr><th scope="row">Governança</th><td>Centralizada no BFF</td><td>Centralizada no BFF</td><td class="recommended-col">Centralizada na Upload API</td></tr>
+              <tr><th scope="row">Retomada de upload</th><td>Implementação própria</td><td>Implementação própria</td><td class="recommended-col">Blocos de Block Blob</td></tr>
+            </tbody>
+          </table>
+          <div class="comparison-notes">
+            <p><strong>Multipart:</strong> streaming com memória limitada é viável, mas mantém o BFF no caminho de transferência.</p>
+            <p><strong>Direct Blob:</strong> reduz tráfego binário no BFF; autorização, status e ciclo de vida permanecem no backend.</p>
+            <p><strong>Retomada:</strong> Block Blob exige controle de blocos e commit pela estratégia do SDK.</p>
+            <p><strong>Base64:</strong> o aumento de payload é aproximado, antes de considerar outros efeitos de serialização.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide slide--architecture" id="slide-3" data-slide="2" aria-labelledby="title-3" aria-hidden="true">
+        <header class="slide-header">
+          <p class="eyebrow">Arquitetura recomendada</p>
+          <h1 id="title-3">Direct-to-Blob: controle centralizado, transferência direta.</h1>
+        </header>
+        <p class="architecture-callout">O BFF controla a autorização. O Azure Storage recebe os arquivos.</p>
+
+        <figure class="architecture-figure">
+          <svg class="architecture-svg" viewBox="0 0 1440 520" role="img" aria-labelledby="diagram-title diagram-description" preserveAspectRatio="xMidYMid meet">
+            <title id="diagram-title">Fluxos de controle, dados e validação de segurança do upload</title>
+            <desc id="diagram-description">O React Native usa o SDK compartilhado para solicitar uma SAS ao BFF, que valida a autorização com Microsoft Entra ID. O SDK envia o arquivo diretamente por HTTPS ao Blob Storage privado em quarentena. O Defender faz uma varredura assíncrona e publica o resultado no Event Grid. Azure Functions aprova apenas arquivos limpos e rejeita os demais. O BFF verifica o status e a aprovação antes do uso pelo negócio.</desc>
+            <defs>
+              <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#0078d4"/></marker>
+              <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#18794e"/></marker>
+              <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#b66a24"/></marker>
+              <marker id="arrow-left" markerWidth="10" markerHeight="10" refX="2" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M10,0 L0,5 L10,10 z" fill="#0078d4"/></marker>
+            </defs>
+
+            <rect x="0" y="0" width="1440" height="190" rx="16" fill="#f2f7fb"/>
+            <rect x="0" y="199" width="1440" height="153" rx="16" fill="#f8fbfd"/>
+            <rect x="0" y="361" width="1440" height="159" rx="16" fill="#f4f8fb"/>
+            <text x="22" y="28" fill="#59738a" font-size="13" font-weight="800" letter-spacing="1.3">PLANO DE CONTROLE</text>
+            <text x="22" y="222" fill="#59738a" font-size="13" font-weight="800" letter-spacing="1.3">PLANO DE DADOS</text>
+            <text x="22" y="385" fill="#59738a" font-size="13" font-weight="800" letter-spacing="1.3">VALIDAÇÃO DE SEGURANÇA</text>
+
+            <!-- Control plane nodes -->
+            <g>
+              <rect x="35" y="64" width="245" height="96" rx="12" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="35" y="64" width="5" height="96" rx="2" fill="#0078d4"/>
+              <text x="56" y="91" fill="#647d92" font-size="11" font-weight="800" letter-spacing="1">APLICAÇÃO</text>
+              <text x="56" y="119" fill="#102a43" font-size="20" font-weight="700">React Native</text>
+              <text x="56" y="142" fill="#526b80" font-size="14">Super App + mini-apps</text>
+            </g>
+            <g>
+              <rect x="340" y="64" width="220" height="96" rx="12" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="340" y="64" width="5" height="96" rx="2" fill="#0078d4"/>
+              <text x="360" y="91" fill="#647d92" font-size="11" font-weight="800" letter-spacing="1">CAPACIDADE COMPARTILHADA</text>
+              <text x="360" y="120" fill="#102a43" font-size="19" font-weight="700">Upload SDK</text>
+              <text x="360" y="143" fill="#526b80" font-size="14">Integração padronizada</text>
+            </g>
+            <g>
+              <rect x="645" y="48" width="305" height="128" rx="12" fill="#fff" stroke="#8fb9d8" stroke-width="1.7"/>
+              <rect x="645" y="48" width="5" height="128" rx="2" fill="#0078d4"/>
+              <text x="667" y="76" fill="#102a43" font-size="20" font-weight="750">BFF / Upload API</text>
+              <text x="667" y="101" fill="#405d75" font-size="14">Valida identidade e autorização</text>
+              <text x="667" y="123" fill="#405d75" font-size="14">Gera User Delegation SAS no backend</text>
+              <text x="667" y="146" fill="#526b80" font-size="12.5">Blob específico · mínimo privilégio · HTTPS · curta duração</text>
+              <text x="667" y="165" fill="#526b80" font-size="12.5">Verifica status do upload e aprovação</text>
+            </g>
+            <g>
+              <rect x="1045" y="64" width="350" height="96" rx="12" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="1045" y="64" width="5" height="96" rx="2" fill="#e27a18"/>
+              <text x="1067" y="97" fill="#102a43" font-size="19" font-weight="700">Microsoft Entra ID</text>
+              <text x="1067" y="122" fill="#526b80" font-size="14">Token do usuário + identidade gerenciada</text>
+              <text x="1067" y="144" fill="#526b80" font-size="13">Chave de delegação obtida pelo backend</text>
+            </g>
+
+            <!-- Control arrows and SAS response -->
+            <path d="M280 111 H332" fill="none" stroke="#0078d4" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+            <text x="285" y="99" fill="#41627c" font-size="11" font-weight="650">usa</text>
+            <path d="M560 94 H637" fill="none" stroke="#0078d4" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+            <text x="565" y="83" fill="#41627c" font-size="11" font-weight="650">solicita SAS</text>
+            <path d="M645 142 H568" fill="none" stroke="#0078d4" stroke-width="2.5" marker-end="url(#arrow-left)"/>
+            <text x="573" y="157" fill="#41627c" font-size="11" font-weight="650">retorna SAS curta</text>
+            <path d="M950 111 H1037" fill="none" stroke="#0078d4" stroke-width="2.5" marker-start="url(#arrow-left)" marker-end="url(#arrow-blue)"/>
+            <text x="954" y="98" fill="#41627c" font-size="10.5" font-weight="650">validação / chave</text>
+
+            <!-- Direct data-plane path from the SDK to quarantine storage -->
+            <path d="M450 160 V270 H157 V390" fill="none" stroke="#0078d4" stroke-width="3" marker-end="url(#arrow-blue)"/>
+            <rect x="236" y="242" width="142" height="26" rx="13" fill="#e7f2fa"/>
+            <text x="307" y="260" text-anchor="middle" fill="#005a9e" font-size="12" font-weight="750">HTTPS + SAS</text>
+            <text x="87" y="303" fill="#526b80" font-size="12">Upload direto ao container de quarentena</text>
+
+            <!-- Security processing nodes -->
+            <g>
+              <rect x="35" y="398" width="240" height="92" rx="11" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="35" y="398" width="5" height="92" rx="2" fill="#0078d4"/>
+              <text x="55" y="427" fill="#102a43" font-size="16" font-weight="720">Azure Blob Storage</text>
+              <text x="55" y="451" fill="#526b80" font-size="13">Quarentena · privado</text>
+              <text x="55" y="472" fill="#526b80" font-size="12">Acesso anônimo desabilitado</text>
+            </g>
+            <g>
+              <rect x="330" y="398" width="235" height="92" rx="11" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="330" y="398" width="5" height="92" rx="2" fill="#e27a18"/>
+              <text x="350" y="427" fill="#102a43" font-size="15.5" font-weight="720">Defender for Storage</text>
+              <text x="350" y="452" fill="#526b80" font-size="13">Varredura de malware</text>
+              <text x="350" y="473" fill="#526b80" font-size="12">Assíncrona após conclusão</text>
+            </g>
+            <g>
+              <rect x="620" y="398" width="200" height="92" rx="11" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="620" y="398" width="5" height="92" rx="2" fill="#0078d4"/>
+              <text x="640" y="427" fill="#102a43" font-size="16" font-weight="720">Azure Event Grid</text>
+              <text x="640" y="452" fill="#526b80" font-size="13">Evento do resultado</text>
+              <text x="640" y="473" fill="#526b80" font-size="12">Entrega assíncrona</text>
+            </g>
+            <g>
+              <rect x="875" y="398" width="235" height="92" rx="11" fill="#fff" stroke="#cbd9e5" stroke-width="1.5"/>
+              <rect x="875" y="398" width="5" height="92" rx="2" fill="#0078d4"/>
+              <text x="895" y="427" fill="#102a43" font-size="16" font-weight="720">Azure Functions</text>
+              <text x="895" y="452" fill="#526b80" font-size="13">Interpreta o resultado</text>
+              <text x="895" y="473" fill="#526b80" font-size="12">Promove limpos; isola rejeitados</text>
+            </g>
+            <g>
+              <rect x="1180" y="386" width="220" height="44" rx="9" fill="#edf7f0" stroke="#9bc9aa" stroke-width="1.3"/>
+              <text x="1197" y="404" fill="#17613e" font-size="11" font-weight="800" letter-spacing="0.6">APROVADO</text>
+              <text x="1197" y="421" fill="#244f39" font-size="12">Container disponível ao negócio</text>
+              <rect x="1180" y="443" width="220" height="44" rx="9" fill="#fbf2ea" stroke="#e8c7a6" stroke-width="1.3"/>
+              <text x="1197" y="461" fill="#8a4c13" font-size="11" font-weight="800" letter-spacing="0.6">REJEITADO</text>
+              <text x="1197" y="478" fill="#74543b" font-size="12">Permanece isolado / política</text>
+            </g>
+
+            <!-- Asynchronous scan-result workflow -->
+            <path d="M275 444 H322" fill="none" stroke="#18794e" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <path d="M565 444 H612" fill="none" stroke="#18794e" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <path d="M820 444 H867" fill="none" stroke="#18794e" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <path d="M1110 444 H1144 V408 H1172" fill="none" stroke="#18794e" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <path d="M1144 444 V465 H1172" fill="none" stroke="#b66a24" stroke-width="2.5" marker-end="url(#arrow-orange)"/>
+          </svg>
+
+          <div class="mobile-architecture" aria-label="Resumo da arquitetura para telas estreitas">
+            <section class="mobile-flow">
+              <h2>Plano de controle</h2>
+              <p>React Native → Upload SDK → BFF / Upload API ↔ Microsoft Entra ID</p>
+              <small>O BFF valida identidade e autorização; gera no backend uma User Delegation SAS por blob, com permissões mínimas, HTTPS e expiração curta.</small>
+            </section>
+            <section class="mobile-flow">
+              <h2>Plano de dados</h2>
+              <p>Upload SDK → Blob Storage privado, container de quarentena</p>
+              <small>Transferência direta por HTTPS + SAS. O acesso anônimo fica desabilitado.</small>
+            </section>
+            <section class="mobile-flow mobile-flow--security">
+              <h2>Validação de segurança</h2>
+              <p>Defender for Storage (assíncrono) → Event Grid → Azure Functions → aprovado ou rejeitado</p>
+              <small>Somente o resultado limpo libera a cópia para o container aprovado. Arquivos rejeitados permanecem isolados conforme a política.</small>
+            </section>
+          </div>
+        </figure>
+        <p class="diagram-note"><strong>SAS autoriza o upload, não aprova o conteúdo.</strong> O BFF verifica de forma independente o status do upload e a aprovação de segurança antes do uso pelo negócio.</p>
+      </section>
+
+      <section class="slide slide--benefits" id="slide-4" data-slide="3" aria-labelledby="title-4" aria-hidden="true">
+        <header class="slide-header">
+          <p class="eyebrow">Racional da decisão</p>
+          <h1 id="title-4">Mais que upload: uma capacidade estratégica da plataforma.</h1>
+          <p class="subtitle">O desenho separa transferência, autorização e aprovação para escalar sem replicar integrações por mini-app.</p>
+        </header>
+
+        <div class="benefits-grid">
+          <article class="benefit">
+            <span class="benefit__number" aria-hidden="true">01</span>
+            <div>
+              <h2>Performance e eficiência</h2>
+              <ul>
+                <li>Remove a transferência binária do BFF.</li>
+                <li>Reduz consumo de banda no backend e evita um salto de rede desnecessário.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="benefit">
+            <span class="benefit__number" aria-hidden="true">02</span>
+            <div>
+              <h2>Escalabilidade</h2>
+              <ul>
+                <li>Blob Storage atende o tráfego de arquivos diretamente.</li>
+                <li>Block Blob suporta estratégias por blocos; o backend fica focado na lógica de negócio.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="benefit">
+            <span class="benefit__number" aria-hidden="true">03</span>
+            <div>
+              <h2>Segurança por design</h2>
+              <ul>
+                <li>User Delegation SAS curta, por blob e com permissões restritas.</li>
+                <li>Storage privado e varredura de malware antes da aprovação.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="benefit">
+            <span class="benefit__number" aria-hidden="true">04</span>
+            <div>
+              <h2>Produtividade e padronização</h2>
+              <ul>
+                <li>Um SDK React Native compartilhado para todas as mini-apps.</li>
+                <li>Políticas de segurança e ciclo de vida administrados pela plataforma.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="architectural-statement">
+          <strong>Manter o BFF no plano de controle, não no caminho de transferência dos arquivos.</strong>
+          <span>Validar resultados no piloto</span>
+        </div>
+      </section>
+
+      <section class="slide slide--decision" id="slide-5" data-slide="4" aria-labelledby="title-5" aria-hidden="true">
+        <header class="slide-header">
+          <p class="eyebrow">Decisão e próximos passos</p>
+          <h1 id="title-5">Decisão proposta à liderança técnica.</h1>
+          <p class="subtitle">Aprovar Direct-to-Blob com User Delegation SAS como arquitetura de referência para os uploads do Super App.</p>
+        </header>
+
+        <div class="s5-layout">
+          <section class="decision-list-panel" aria-labelledby="requested-decisions">
+            <h2 id="requested-decisions">Decisões solicitadas</h2>
+            <ol class="leadership-list">
+              <li><span><strong>Adotar Direct-to-Blob</strong> como estratégia padrão de upload.</span></li>
+              <li><span><strong>Estabelecer a Upload API</strong> como capacidade centralizada da plataforma.</span></li>
+              <li><span><strong>Implementar o SDK React Native</strong> compartilhado entre mini-apps.</span></li>
+              <li><span><strong>Adotar Microsoft Defender for Storage</strong>, sujeito à validação de custo e disponibilidade regional.</span></li>
+              <li><span><strong>Autorizar um piloto</strong> com uma mini-app e critérios de segurança e desempenho.</span></li>
+            </ol>
+          </section>
+
+          <section class="roadmap-panel" aria-labelledby="implementation-roadmap">
+            <h2 id="implementation-roadmap">Roteiro de implementação</h2>
+            <ol class="roadmap-list">
+              <li class="roadmap-step"><span class="roadmap-step__marker">01</span><div><h3>Fundação Azure</h3><p>Storage privado, identidade e autorização SAS.</p></div></li>
+              <li class="roadmap-step"><span class="roadmap-step__marker">02</span><div><h3>Quarentena e varredura</h3><p>Defender, Event Grid e fluxo de aprovação.</p></div></li>
+              <li class="roadmap-step"><span class="roadmap-step__marker">03</span><div><h3>SDK React Native</h3><p>Contrato comum para envio e consulta de status.</p></div></li>
+              <li class="roadmap-step"><span class="roadmap-step__marker">04</span><div><h3>Piloto e validação</h3><p>Medir desempenho, segurança, custo e operação.</p></div></li>
+            </ol>
+          </section>
+        </div>
+
+        <p class="closing-statement">Não estamos criando apenas um mecanismo de upload. Estamos estabelecendo uma capacidade segura, reutilizável e escalável para todo o ecossistema Super App.</p>
+      </section>
+    </main>
+
+    <footer class="chrome" aria-label="Controles da apresentação">
+      <div class="chrome__identity">
+        <span>ARQUITETURA SUPER APP</span>
+        <span class="slide-count" aria-live="polite" aria-atomic="true"><strong id="currentSlide">01</strong> / <span id="totalSlides">05</span></span>
+      </div>
+      <nav class="chrome__controls" aria-label="Navegação de slides">
+        <button class="control-button" type="button" data-action="previous" aria-label="Slide anterior" title="Slide anterior">‹</button>
+        <div class="nav-dots" role="group" aria-label="Ir para um slide">
+          <button class="nav-dot" type="button" data-go="0" aria-label="Ir para o slide 1" aria-current="step"></button>
+          <button class="nav-dot" type="button" data-go="1" aria-label="Ir para o slide 2"></button>
+          <button class="nav-dot" type="button" data-go="2" aria-label="Ir para o slide 3"></button>
+          <button class="nav-dot" type="button" data-go="3" aria-label="Ir para o slide 4"></button>
+          <button class="nav-dot" type="button" data-go="4" aria-label="Ir para o slide 5"></button>
+        </div>
+        <button class="control-button" type="button" data-action="next" aria-label="Próximo slide" title="Próximo slide">›</button>
+        <span class="control-divider" aria-hidden="true"></span>
+        <button class="control-button control-button--utility" type="button" data-action="fullscreen" aria-label="Entrar em tela cheia" title="Tela cheia">⛶</button>
+        <button class="control-button control-button--utility" type="button" data-action="print" aria-label="Imprimir ou exportar como PDF" title="Imprimir / PDF">PDF</button>
+      </nav>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var dots = Array.prototype.slice.call(document.querySelectorAll('.nav-dot'));
+      var currentLabel = document.getElementById('currentSlide');
+      var totalLabel = document.getElementById('totalSlides');
+      var progress = document.getElementById('progressBar');
+      var progressTrack = document.querySelector('.progress-track');
+      var current = 0;
+
+      totalLabel.textContent = String(slides.length).padStart(2, '0');
+      progressTrack.setAttribute('aria-valuemax', String(slides.length));
+
+      function showSlide(index) {
+        if (index < 0 || index >= slides.length || index === current) return;
+        slides[current].classList.remove('is-active');
+        slides[current].setAttribute('aria-hidden', 'true');
+        current = index;
+        slides[current].classList.add('is-active');
+        slides[current].setAttribute('aria-hidden', 'false');
+        currentLabel.textContent = String(current + 1).padStart(2, '0');
+        progress.style.width = ((current + 1) / slides.length * 100) + '%';
+        progressTrack.setAttribute('aria-valuenow', String(current + 1));
+        dots.forEach(function (dot, dotIndex) {
+          if (dotIndex === current) dot.setAttribute('aria-current', 'step');
+          else dot.removeAttribute('aria-current');
+        });
+        document.title = (current + 1) + '/' + slides.length + ' · Upload Seguro de Arquivos no Super App';
+      }
+
+      document.querySelector('[data-action="previous"]').addEventListener('click', function () { showSlide(current - 1); });
+      document.querySelector('[data-action="next"]').addEventListener('click', function () { showSlide(current + 1); });
+      dots.forEach(function (dot) {
+        dot.addEventListener('click', function () { showSlide(Number(dot.getAttribute('data-go'))); });
+      });
+      document.querySelector('[data-action="print"]').addEventListener('click', function () { window.print(); });
+
+      var fullscreenButton = document.querySelector('[data-action="fullscreen"]');
+      fullscreenButton.addEventListener('click', function () {
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen();
+        } else if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(function () {});
+        }
+      });
+      document.addEventListener('fullscreenchange', function () {
+        var isFullscreen = Boolean(document.fullscreenElement);
+        fullscreenButton.setAttribute('aria-label', isFullscreen ? 'Sair da tela cheia' : 'Entrar em tela cheia');
+        fullscreenButton.setAttribute('title', isFullscreen ? 'Sair da tela cheia' : 'Tela cheia');
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        var target = event.target;
+        if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+        if (event.key === 'ArrowRight' || event.key === 'PageDown') {
+          event.preventDefault();
+          showSlide(Math.min(current + 1, slides.length - 1));
+        } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          showSlide(Math.max(current - 1, 0));
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          showSlide(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          showSlide(slides.length - 1);
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          fullscreenButton.click();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
